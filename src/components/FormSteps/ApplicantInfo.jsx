@@ -1,0 +1,123 @@
+import React from 'react';
+import Input from '../FormElements/Input';
+import Select from '../FormElements/Select';
+import DatePicker from '../FormElements/DatePicker';
+import '../../styles/components.css';
+
+const ApplicantInfo = ({ formData, onChange }) => {
+    const applicantRoleOptions = [
+        { value: 'primary', label: 'Primary Applicant' },
+        { value: 'co-applicant', label: 'Co-Applicant' }
+    ];
+
+    const suffixOptions = [
+        { value: '', label: 'None' },
+        { value: 'Jr.', label: 'Jr.' },
+        { value: 'Sr.', label: 'Sr.' },
+        { value: 'II', label: 'II' },
+        { value: 'III', label: 'III' }
+    ];
+
+    return (
+        <div className="card fade-in">
+            <div className="card-header">
+                <h2 className="card-title">Applicant Information</h2>
+                <p className="card-subtitle">Provide your personal details</p>
+            </div>
+
+            <Select
+                label="Applicant Role"
+                name="applicant_role"
+                value={formData.applicant_role || 'primary'}
+                onChange={onChange}
+                options={applicantRoleOptions}
+                required
+            />
+
+            <div className="form-grid-3">
+                <Input
+                    label="First Name"
+                    name="first_name"
+                    value={formData.first_name || ''}
+                    onChange={onChange}
+                    required
+                />
+
+                <Input
+                    label="Middle Name"
+                    name="middle_name"
+                    value={formData.middle_name || ''}
+                    onChange={onChange}
+                />
+
+                <Input
+                    label="Last Name"
+                    name="last_name"
+                    value={formData.last_name || ''}
+                    onChange={onChange}
+                    required
+                />
+            </div>
+
+            <div className="form-grid-2">
+                <Select
+                    label="Suffix"
+                    name="suffix"
+                    value={formData.suffix || ''}
+                    onChange={onChange}
+                    options={suffixOptions}
+                />
+
+                <DatePicker
+                    label="Date of Birth"
+                    name="date_of_birth"
+                    value={formData.date_of_birth || ''}
+                    onChange={onChange}
+                    max={new Date().toISOString().split('T')[0]}
+                    required
+                />
+            </div>
+
+            <div className="form-grid-2">
+                <Input
+                    label="SSN (Last 4 Digits)"
+                    name="ssn_last4"
+                    value={formData.ssn_last4 || ''}
+                    onChange={onChange}
+                    placeholder="XXXX"
+                    maxLength="4"
+                    pattern="[0-9]{4}"
+                />
+
+                <Input
+                    label="ITIN Number"
+                    name="itin_number"
+                    value={formData.itin_number || ''}
+                    onChange={onChange}
+                    placeholder="Optional"
+                />
+            </div>
+
+            <div className="form-grid-2">
+                <Input
+                    label="Citizenship Status"
+                    name="citizenship_status"
+                    value={formData.citizenship_status || ''}
+                    onChange={onChange}
+                    placeholder="e.g., US Citizen, Permanent Resident"
+                />
+
+                <Input
+                    label="Email Address"
+                    name="email"
+                    type="email"
+                    value={formData.email || ''}
+                    onChange={onChange}
+                    required
+                />
+            </div>
+        </div>
+    );
+};
+
+export default ApplicantInfo;
