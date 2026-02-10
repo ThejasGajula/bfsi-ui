@@ -16,12 +16,14 @@ const EmploymentDetails = ({ formData, onChange }) => {
         onChange({ target: { name: 'employment', value: updatedEmployment } });
     };
 
-    const employmentTypeOptions = [
-        { value: 'full-time', label: 'Full-Time' },
-        { value: 'part-time', label: 'Part-Time' },
-        { value: 'self-employed', label: 'Self-Employed' },
-        { value: 'contract', label: 'Contract' }
-    ];
+   const employmentTypeOptions = [
+  { value: 'salaried', label: 'Salaried' },
+  { value: 'self_employed', label: 'Self-Employed' },
+  { value: 'retired', label: 'Retired' },
+  { value: 'unemployed', label: 'Unemployed' }
+];
+
+
 
     const employmentStatusOptions = [
         { value: 'employed', label: 'Employed' },

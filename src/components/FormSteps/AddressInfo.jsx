@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Input from '../FormElements/Input';
 import Select from '../FormElements/Select';
-import Button from '../FormElements/Button';
 import '../../styles/components.css';
 
 const AddressInfo = ({ formData, onChange }) => {
@@ -9,42 +8,51 @@ const AddressInfo = ({ formData, onChange }) => {
 
     const addressTypeOptions = [
         { value: 'current', label: 'Current Address' },
-        { value: 'previous', label: 'Previous Address' },
+        { value: 'permanent', label: 'Permanent Address' },
         { value: 'mailing', label: 'Mailing Address' }
+    ];
+
+    const housingStatusOptions = [
+        { value: 'own', label: 'Own' },
+        { value: 'rent', label: 'Rent' }
     ];
 
     const addAddress = () => {
         const newAddress = {
-            address_type: '',
-            street: '',
+            address_type: 'current',
+            address_line1: '',
             city: '',
             state: '',
             zip_code: '',
-            country: 'USA'
+            country: 'USA',
+            housing_status: '',
+            years_at_address: '',
+            months_at_address: ''
         };
-        const updatedAddresses = [...addresses, newAddress];
-        setAddresses(updatedAddresses);
-        onChange({ target: { name: 'addresses', value: updatedAddresses } });
+
+        const updated = [...addresses, newAddress];
+        setAddresses(updated);
+        onChange({ target: { name: 'addresses', value: updated } });
     };
 
     const removeAddress = (index) => {
-        const updatedAddresses = addresses.filter((_, i) => i !== index);
-        setAddresses(updatedAddresses);
-        onChange({ target: { name: 'addresses', value: updatedAddresses } });
+        const updated = addresses.filter((_, i) => i !== index);
+        setAddresses(updated);
+        onChange({ target: { name: 'addresses', value: updated } });
     };
 
     const updateAddress = (index, field, value) => {
-        const updatedAddresses = [...addresses];
-        updatedAddresses[index][field] = value;
-        setAddresses(updatedAddresses);
-        onChange({ target: { name: 'addresses', value: updatedAddresses } });
+        const updated = [...addresses];
+        updated[index][field] = value;
+        setAddresses(updated);
+        onChange({ target: { name: 'addresses', value: updated } });
     };
 
     return (
         <div className="card fade-in">
             <div className="card-header">
                 <h2 className="card-title">Address Information</h2>
-                <p className="card-subtitle">Add your current and previous addresses</p>
+                <p className="card-subtitle">Provide your residential details</p>
             </div>
 
             {addresses.map((address, index) => (
@@ -54,8 +62,8 @@ const AddressInfo = ({ formData, onChange }) => {
                         {addresses.length > 1 && (
                             <button
                                 className="btn-remove"
-                                onClick={() => removeAddress(index)}
                                 type="button"
+                                onClick={() => removeAddress(index)}
                             >
                                 Remove
                             </button>
@@ -64,58 +72,91 @@ const AddressInfo = ({ formData, onChange }) => {
 
                     <Select
                         label="Address Type"
-                        name={`address_type_${index}`}
-                        value={address.address_type || ''}
-                        onChange={(e) => updateAddress(index, 'address_type', e.target.value)}
+                        value={address.address_type}
                         options={addressTypeOptions}
+                        onChange={(e) =>
+                            updateAddress(index, 'address_type', e.target.value)
+                        }
                         required
                     />
 
                     <Input
-                        label="Street Address"
-                        name={`street_${index}`}
-                        value={address.street || ''}
-                        onChange={(e) => updateAddress(index, 'street', e.target.value)}
+                        label="Address Line 1"
+                        value={address.address_line1}
+                        onChange={(e) =>
+                            updateAddress(index, 'address_line1', e.target.value)
+                        }
                         required
                     />
 
                     <div className="form-grid-3">
                         <Input
                             label="City"
-                            name={`city_${index}`}
-                            value={address.city || ''}
-                            onChange={(e) => updateAddress(index, 'city', e.target.value)}
+                            value={address.city}
+                            onChange={(e) =>
+                                updateAddress(index, 'city', e.target.value)
+                            }
                             required
                         />
 
                         <Input
                             label="State"
-                            name={`state_${index}`}
-                            value={address.state || ''}
-                            onChange={(e) => updateAddress(index, 'state', e.target.value)}
+                            value={address.state}
+                            onChange={(e) =>
+                                updateAddress(index, 'state', e.target.value)
+                            }
                             required
                         />
 
                         <Input
                             label="ZIP Code"
-                            name={`zip_code_${index}`}
-                            value={address.zip_code || ''}
-                            onChange={(e) => updateAddress(index, 'zip_code', e.target.value)}
+                            value={address.zip_code}
+                            onChange={(e) =>
+                                updateAddress(index, 'zip_code', e.target.value)
+                            }
                             required
                         />
                     </div>
 
-                    <Input
-                        label="Country"
-                        name={`country_${index}`}
-                        value={address.country || 'USA'}
-                        onChange={(e) => updateAddress(index, 'country', e.target.value)}
+                    <Select
+                        label="Housing Status"
+                        value={address.housing_status}
+                        options={housingStatusOptions}
+                        onChange={(e) =>
+                            updateAddress(index, 'housing_status', e.target.value)
+                        }
                         required
                     />
+
+                    <div className="form-grid-2">
+                        <Input
+                            label="Years at Address"
+                            type="number"
+                            min="0"
+                            max="50"
+                            value={address.years_at_address}
+                            onChange={(e) =>
+                                updateAddress(index, 'years_at_address', Number(e.target.value))
+                            }
+                            required
+                        />
+
+                        <Input
+                            label="Months at Address"
+                            type="number"
+                            min="0"
+                            max="11"
+                            value={address.months_at_address}
+                            onChange={(e) =>
+                                updateAddress(index, 'months_at_address', Number(e.target.value))
+                            }
+                            required
+                        />
+                    </div>
                 </div>
             ))}
 
-            <button className="btn-add" onClick={addAddress} type="button">
+            <button className="btn-add" type="button" onClick={addAddress}>
                 + Add Another Address
             </button>
         </div>

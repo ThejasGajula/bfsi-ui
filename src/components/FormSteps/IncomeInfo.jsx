@@ -24,10 +24,11 @@ const IncomeInfo = ({ formData, onChange }) => {
     const addIncome = () => {
         const newIncome = {
             income_type: '',
-            amount: '',
-            frequency: 'monthly',
-            source: ''
+            description: '',
+            monthly_amount: '',
+            income_frequency: 'monthly'
         };
+
         const updatedIncomes = [...incomes, newIncome];
         setIncomes(updatedIncomes);
         onChange({ target: { name: 'incomes', value: updatedIncomes } });
@@ -49,20 +50,16 @@ const IncomeInfo = ({ formData, onChange }) => {
     return (
         <div className="card fade-in">
             <div className="card-header">
-                <h2 className="card-title">Additional Income</h2>
-                <p className="card-subtitle">Add any additional sources of income</p>
+                <h2 className="card-title">Income Information</h2>
+                <p className="card-subtitle">Add all sources of income</p>
             </div>
-
-            {incomes.length === 0 && (
-                <p style={{ color: 'var(--text-muted)', marginBottom: 'var(--spacing-lg)' }}>
-                    No additional income sources added yet. Click the button below to add one.
-                </p>
-            )}
 
             {incomes.map((income, index) => (
                 <div key={index} className="dynamic-list-item">
                     <div className="dynamic-list-header">
-                        <h3 className="dynamic-list-title">Income Source {index + 1}</h3>
+                        <h3 className="dynamic-list-title">
+                            Income {index + 1}
+                        </h3>
                         <button
                             className="btn-remove"
                             onClick={() => removeIncome(index)}
@@ -75,48 +72,49 @@ const IncomeInfo = ({ formData, onChange }) => {
                     <div className="form-grid-2">
                         <Select
                             label="Income Type"
-                            name={`income_type_${index}`}
                             value={income.income_type || ''}
-                            onChange={(e) => updateIncome(index, 'income_type', e.target.value)}
+                            onChange={(e) =>
+                                updateIncome(index, 'income_type', e.target.value)
+                            }
                             options={incomeTypeOptions}
                             required
                         />
 
-                        <Input
-                            label="Source"
-                            name={`source_${index}`}
-                            value={income.source || ''}
-                            onChange={(e) => updateIncome(index, 'source', e.target.value)}
-                            placeholder="e.g., Company name, Property address"
-                            required
-                        />
-                    </div>
-
-                    <div className="form-grid-2">
-                        <Input
-                            label="Amount"
-                            name={`amount_${index}`}
-                            type="number"
-                            value={income.amount || ''}
-                            onChange={(e) => updateIncome(index, 'amount', e.target.value)}
-                            placeholder="0"
-                            required
-                        />
-
                         <Select
-                            label="Frequency"
-                            name={`frequency_${index}`}
-                            value={income.frequency || 'monthly'}
-                            onChange={(e) => updateIncome(index, 'frequency', e.target.value)}
+                            label="Income Frequency"
+                            value={income.income_frequency || 'monthly'}
+                            onChange={(e) =>
+                                updateIncome(index, 'income_frequency', e.target.value)
+                            }
                             options={frequencyOptions}
                             required
                         />
                     </div>
+
+                    <Input
+                        label="Monthly Amount"
+                        type="number"
+                        value={income.monthly_amount || ''}
+                        onChange={(e) =>
+                            updateIncome(index, 'monthly_amount', e.target.value)
+                        }
+                        placeholder="0.00"
+                        required
+                    />
+
+                    <Input
+                        label="Description"
+                        value={income.description || ''}
+                        onChange={(e) =>
+                            updateIncome(index, 'description', e.target.value)
+                        }
+                        placeholder="Employer name, rental property, etc."
+                    />
                 </div>
             ))}
 
             <button className="btn-add" onClick={addIncome} type="button">
-                + Add Income Source
+                + Add Income
             </button>
         </div>
     );

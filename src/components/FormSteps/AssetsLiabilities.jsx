@@ -7,6 +7,8 @@ const AssetsLiabilities = ({ formData, onChange }) => {
     const [assets, setAssets] = useState(formData.assets || []);
     const [liabilities, setLiabilities] = useState(formData.liabilities || []);
 
+    /* ---------------- ASSETS ---------------- */
+
     const assetTypeOptions = [
         { value: 'savings', label: 'Savings Account' },
         { value: 'checking', label: 'Checking Account' },
@@ -15,6 +17,38 @@ const AssetsLiabilities = ({ formData, onChange }) => {
         { value: 'vehicle', label: 'Vehicle' },
         { value: 'other', label: 'Other' }
     ];
+
+    const ownershipOptions = [
+        { value: 'individual', label: 'Individual' },
+        { value: 'joint', label: 'Joint' }
+    ];
+
+    const addAsset = () => {
+        const newAsset = {
+            asset_type: '',
+            institution_name: '',
+            value: '',
+            ownership_type: 'individual'
+        };
+        const updated = [...assets, newAsset];
+        setAssets(updated);
+        onChange({ target: { name: 'assets', value: updated } });
+    };
+
+    const updateAsset = (i, f, v) => {
+        const updated = [...assets];
+        updated[i][f] = v;
+        setAssets(updated);
+        onChange({ target: { name: 'assets', value: updated } });
+    };
+
+    const removeAsset = (i) => {
+        const updated = assets.filter((_, idx) => idx !== i);
+        setAssets(updated);
+        onChange({ target: { name: 'assets', value: updated } });
+    };
+
+    /* ---------------- LIABILITIES ---------------- */
 
     const liabilityTypeOptions = [
         { value: 'credit_card', label: 'Credit Card' },
@@ -25,101 +59,84 @@ const AssetsLiabilities = ({ formData, onChange }) => {
         { value: 'other', label: 'Other' }
     ];
 
-    const addAsset = () => {
-        const newAsset = { asset_type: '', description: '', value: '' };
-        const updatedAssets = [...assets, newAsset];
-        setAssets(updatedAssets);
-        onChange({ target: { name: 'assets', value: updatedAssets } });
-    };
-
-    const removeAsset = (index) => {
-        const updatedAssets = assets.filter((_, i) => i !== index);
-        setAssets(updatedAssets);
-        onChange({ target: { name: 'assets', value: updatedAssets } });
-    };
-
-    const updateAsset = (index, field, value) => {
-        const updatedAssets = [...assets];
-        updatedAssets[index][field] = value;
-        setAssets(updatedAssets);
-        onChange({ target: { name: 'assets', value: updatedAssets } });
-    };
+    const yesNoOptions = [
+        { value: true, label: 'Yes' },
+        { value: false, label: 'No' }
+    ];
 
     const addLiability = () => {
-        const newLiability = { liability_type: '', creditor: '', balance: '', monthly_payment: '' };
-        const updatedLiabilities = [...liabilities, newLiability];
-        setLiabilities(updatedLiabilities);
-        onChange({ target: { name: 'liabilities', value: updatedLiabilities } });
+        const newLiability = {
+            liability_type: '',
+            creditor_name: '',
+            outstanding_balance: '',
+            monthly_payment: '',
+            months_remaining: '',
+            co_signed: false,
+            federal_debt: false,
+            delinquent_flag: false,
+            days_delinquent: 0
+        };
+        const updated = [...liabilities, newLiability];
+        setLiabilities(updated);
+        onChange({ target: { name: 'liabilities', value: updated } });
     };
 
-    const removeLiability = (index) => {
-        const updatedLiabilities = liabilities.filter((_, i) => i !== index);
-        setLiabilities(updatedLiabilities);
-        onChange({ target: { name: 'liabilities', value: updatedLiabilities } });
+    const updateLiability = (i, f, v) => {
+        const updated = [...liabilities];
+        updated[i][f] = v;
+        setLiabilities(updated);
+        onChange({ target: { name: 'liabilities', value: updated } });
     };
 
-    const updateLiability = (index, field, value) => {
-        const updatedLiabilities = [...liabilities];
-        updatedLiabilities[index][field] = value;
-        setLiabilities(updatedLiabilities);
-        onChange({ target: { name: 'liabilities', value: updatedLiabilities } });
+    const removeLiability = (i) => {
+        const updated = liabilities.filter((_, idx) => idx !== i);
+        setLiabilities(updated);
+        onChange({ target: { name: 'liabilities', value: updated } });
     };
 
     return (
         <div className="card fade-in">
-            <div className="card-header">
-                <h2 className="card-title">Assets & Liabilities</h2>
-                <p className="card-subtitle">Provide your financial overview</p>
-            </div>
+            <h2 className="card-title">Assets & Liabilities</h2>
 
-            {/* Assets Section */}
-            <h3 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 600, color: 'var(--text-primary)', marginBottom: 'var(--spacing-md)' }}>
-                Assets
-            </h3>
+            {/* -------- ASSETS -------- */}
+            <h3 className="section-title">Assets</h3>
 
-            {assets.length === 0 && (
-                <p style={{ color: 'var(--text-muted)', marginBottom: 'var(--spacing-lg)' }}>
-                    No assets added yet.
-                </p>
-            )}
-
-            {assets.map((asset, index) => (
-                <div key={index} className="dynamic-list-item">
-                    <div className="dynamic-list-header">
-                        <h4 className="dynamic-list-title">Asset {index + 1}</h4>
-                        <button className="btn-remove" onClick={() => removeAsset(index)} type="button">
-                            Remove
-                        </button>
-                    </div>
-
-                    <div className="form-grid-2">
-                        <Select
-                            label="Asset Type"
-                            name={`asset_type_${index}`}
-                            value={asset.asset_type || ''}
-                            onChange={(e) => updateAsset(index, 'asset_type', e.target.value)}
-                            options={assetTypeOptions}
-                            required
-                        />
-
-                        <Input
-                            label="Estimated Value"
-                            name={`asset_value_${index}`}
-                            type="number"
-                            value={asset.value || ''}
-                            onChange={(e) => updateAsset(index, 'value', e.target.value)}
-                            placeholder="0"
-                            required
-                        />
-                    </div>
+            {assets.map((a, i) => (
+                <div key={i} className="dynamic-list-item">
+                    <Select
+                        label="Asset Type"
+                        value={a.asset_type}
+                        onChange={(e) => updateAsset(i, 'asset_type', e.target.value)}
+                        options={assetTypeOptions}
+                        required
+                    />
 
                     <Input
-                        label="Description"
-                        name={`asset_description_${index}`}
-                        value={asset.description || ''}
-                        onChange={(e) => updateAsset(index, 'description', e.target.value)}
-                        placeholder="e.g., Bank name, Property address"
+                        label="Institution Name"
+                        value={a.institution_name}
+                        onChange={(e) => updateAsset(i, 'institution_name', e.target.value)}
+                        required
                     />
+
+                    <Input
+                        label="Estimated Value"
+                        type="number"
+                        value={a.value}
+                        onChange={(e) => updateAsset(i, 'value', e.target.value)}
+                        required
+                    />
+
+                    <Select
+                        label="Ownership Type"
+                        value={a.ownership_type}
+                        onChange={(e) => updateAsset(i, 'ownership_type', e.target.value)}
+                        options={ownershipOptions}
+                        required
+                    />
+
+                    <button className="btn-remove" onClick={() => removeAsset(i)} type="button">
+                        Remove Asset
+                    </button>
                 </div>
             ))}
 
@@ -127,69 +144,84 @@ const AssetsLiabilities = ({ formData, onChange }) => {
                 + Add Asset
             </button>
 
-            <div className="section-divider"></div>
+            {/* -------- LIABILITIES -------- */}
+            <h3 className="section-title">Liabilities</h3>
 
-            {/* Liabilities Section */}
-            <h3 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 600, color: 'var(--text-primary)', marginBottom: 'var(--spacing-md)' }}>
-                Liabilities
-            </h3>
+            {liabilities.map((l, i) => (
+                <div key={i} className="dynamic-list-item">
+                    <Select
+                        label="Liability Type"
+                        value={l.liability_type}
+                        onChange={(e) => updateLiability(i, 'liability_type', e.target.value)}
+                        options={liabilityTypeOptions}
+                        required
+                    />
 
-            {liabilities.length === 0 && (
-                <p style={{ color: 'var(--text-muted)', marginBottom: 'var(--spacing-lg)' }}>
-                    No liabilities added yet.
-                </p>
-            )}
+                    <Input
+                        label="Creditor Name"
+                        value={l.creditor_name}
+                        onChange={(e) => updateLiability(i, 'creditor_name', e.target.value)}
+                        required
+                    />
 
-            {liabilities.map((liability, index) => (
-                <div key={index} className="dynamic-list-item">
-                    <div className="dynamic-list-header">
-                        <h4 className="dynamic-list-title">Liability {index + 1}</h4>
-                        <button className="btn-remove" onClick={() => removeLiability(index)} type="button">
-                            Remove
-                        </button>
-                    </div>
+                    <Input
+                        label="Outstanding Balance"
+                        type="number"
+                        value={l.outstanding_balance}
+                        onChange={(e) => updateLiability(i, 'outstanding_balance', e.target.value)}
+                        required
+                    />
 
-                    <div className="form-grid-2">
-                        <Select
-                            label="Liability Type"
-                            name={`liability_type_${index}`}
-                            value={liability.liability_type || ''}
-                            onChange={(e) => updateLiability(index, 'liability_type', e.target.value)}
-                            options={liabilityTypeOptions}
-                            required
-                        />
+                    <Input
+                        label="Monthly Payment"
+                        type="number"
+                        value={l.monthly_payment}
+                        onChange={(e) => updateLiability(i, 'monthly_payment', e.target.value)}
+                        required
+                    />
 
+                    <Input
+                        label="Months Remaining"
+                        type="number"
+                        value={l.months_remaining}
+                        onChange={(e) => updateLiability(i, 'months_remaining', e.target.value)}
+                        required
+                    />
+
+                    <Select
+                        label="Co-signed?"
+                        value={l.co_signed}
+                        onChange={(e) => updateLiability(i, 'co_signed', e.target.value === 'true')}
+                        options={yesNoOptions}
+                    />
+
+                    <Select
+                        label="Federal Debt?"
+                        value={l.federal_debt}
+                        onChange={(e) => updateLiability(i, 'federal_debt', e.target.value === 'true')}
+                        options={yesNoOptions}
+                    />
+
+                    <Select
+                        label="Delinquent?"
+                        value={l.delinquent_flag}
+                        onChange={(e) => updateLiability(i, 'delinquent_flag', e.target.value === 'true')}
+                        options={yesNoOptions}
+                    />
+
+                    {l.delinquent_flag && (
                         <Input
-                            label="Creditor"
-                            name={`creditor_${index}`}
-                            value={liability.creditor || ''}
-                            onChange={(e) => updateLiability(index, 'creditor', e.target.value)}
-                            placeholder="e.g., Bank name"
-                            required
-                        />
-                    </div>
-
-                    <div className="form-grid-2">
-                        <Input
-                            label="Current Balance"
-                            name={`balance_${index}`}
+                            label="Days Delinquent"
                             type="number"
-                            value={liability.balance || ''}
-                            onChange={(e) => updateLiability(index, 'balance', e.target.value)}
-                            placeholder="0"
+                            value={l.days_delinquent}
+                            onChange={(e) => updateLiability(i, 'days_delinquent', e.target.value)}
                             required
                         />
+                    )}
 
-                        <Input
-                            label="Monthly Payment"
-                            name={`monthly_payment_${index}`}
-                            type="number"
-                            value={liability.monthly_payment || ''}
-                            onChange={(e) => updateLiability(index, 'monthly_payment', e.target.value)}
-                            placeholder="0"
-                            required
-                        />
-                    </div>
+                    <button className="btn-remove" onClick={() => removeLiability(i)} type="button">
+                        Remove Liability
+                    </button>
                 </div>
             ))}
 
