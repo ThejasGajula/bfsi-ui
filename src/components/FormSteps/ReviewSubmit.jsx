@@ -9,7 +9,9 @@ const ReviewSubmit = ({ formData, onEdit }) => {
             currency: 'USD'
         }).format(value || 0);
     };
-
+     const loan = formData.loan || {};
+    const applicant = formData.applicant || {};
+    // const employee=formData.employee || {};
     const renderSection = (title, data, editStep) => (
         <div style={{
             background: 'rgba(255, 255, 255, 0.02)',
@@ -62,20 +64,20 @@ const ReviewSubmit = ({ formData, onEdit }) => {
             </div>
 
             {renderSection('Loan Details', {
-                loan_type: formData.loan_type,
-                credit_type: formData.credit_type,
-                loan_purpose: formData.loan_purpose,
-                requested_amount: formData.requested_amount,
-                requested_term_months: formData.requested_term_months,
-                preferred_payment_day: formData.preferred_payment_day,
-                origination_channel: formData.origination_channel
+                loan_type: loan.loan_type,
+                credit_type: loan.credit_type,
+                loan_purpose: loan.loan_purpose,
+                requested_amount: loan.requested_amount,
+                requested_term_months: loan.requested_term_months,
+                preferred_payment_day: loan.preferred_payment_day,
+                origination_channel: loan.origination_channel
             }, 0)}
 
             {renderSection('Applicant Information', {
-                name: `${formData.first_name || ''} ${formData.middle_name || ''} ${formData.last_name || ''}`.trim(),
-                date_of_birth: formData.date_of_birth,
-                email: formData.email,
-                citizenship_status: formData.citizenship_status
+                name: `${applicant.first_name || ''} ${applicant.middle_name || ''} ${applicant.last_name || ''}`.trim(),
+                date_of_birth: applicant.date_of_birth,
+                email: applicant.email,
+                citizenship_status: applicant.citizenship_status
             }, 1)}
 
             {formData.addresses && formData.addresses.length > 0 && (
@@ -112,46 +114,57 @@ const ReviewSubmit = ({ formData, onEdit }) => {
                 </div>
             )}
 
-            {formData.employment && renderSection('Employment', {
-                employer: formData.employment.employer_name,
-                job_title: formData.employment.job_title,
-                employment_type: formData.employment.employment_type,
-                gross_monthly_income: formData.employment.gross_monthly_income
+            {applicant.employment && renderSection('Employment', {
+                employer: applicant.employment.employer_name,
+                job_title: applicant.employment.job_title,
+                employment_type: applicant.employment.employment_type,
+                gross_monthly_income: applicant.employment.gross_monthly_income
             }, 3)}
 
-            {formData.incomes && formData.incomes.length > 0 && (
-                <div style={{
-                    background: 'rgba(255, 255, 255, 0.02)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: 'var(--spacing-lg)',
-                    marginBottom: 'var(--spacing-lg)'
-                }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-md)' }}>
-                        <h3 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 600, color: 'var(--text-primary)' }}>
-                            Additional Income ({formData.incomes.length})
-                        </h3>
-                        <button
-                            onClick={() => onEdit(4)}
-                            style={{
-                                background: 'transparent',
-                                color: 'var(--primary-color)',
-                                border: 'none',
-                                cursor: 'pointer',
-                                fontSize: 'var(--font-size-sm)',
-                                textDecoration: 'underline'
-                            }}
-                        >
-                            Edit
-                        </button>
-                    </div>
-                    {formData.incomes.map((inc, idx) => (
-                        <p key={idx} style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--spacing-xs)' }}>
-                            {inc.income_type}: {formatCurrency(inc.amount)} ({inc.frequency})
-                        </p>
-                    ))}
-                </div>
-            )}
+          {applicant.incomes && applicant.incomes.length > 0 &&
+ renderSection(
+     'Additional Income',
+     applicant.incomes.reduce((acc, inc, index) => {
+         acc[`income_${index + 1}_type`] = inc.income_type;
+         acc[`income_${index + 1}_monthly_amount`] = inc.monthly_amount;
+         acc[`income_${index + 1}_frequency`] = inc.frequency;
+         return acc;
+     }, {}),
+     4
+ )
+}
+
+ 
+
+ {applicant.assets && applicant.assets.length > 0 &&
+ renderSection(
+     'Assets',
+     applicant.assets.reduce((acc, asset, index) => {
+         acc[`asset_${index + 1}_type`] = asset.asset_type;
+         acc[`asset_${index + 1}_value`] = asset.value;
+         return acc;
+     }, {}),
+     5
+ )
+}
+
+
+
+{applicant.liabilities && applicant.liabilities.length > 0 &&
+ renderSection(
+     'Liabilities',
+     applicant.liabilities.reduce((acc, liab, index) => {
+         acc[`liability_${index + 1}_type`] = liab.liability_type;
+         acc[`liability_${index + 1}_outstanding_balance`] = liab.outstanding_balance;
+         acc[`liability_${index + 1}_monthly_payment`] = liab.monthly_payment;
+         acc[`liability_${index + 1}_months_remaining`] = liab.months_remaining;
+         return acc;
+     }, {}),
+     5
+ )
+}
+
+
 
             <div style={{
                 background: 'rgba(102, 126, 234, 0.05)',

@@ -77,7 +77,7 @@ const LoanDetails = ({ formData, onChange }) => {
                     value={formData.requested_term_months || ''}
                     onChange={onChange}
                     placeholder="0"
-                    required
+                  
                 />
             </div>
 

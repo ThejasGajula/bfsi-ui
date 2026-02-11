@@ -11,9 +11,9 @@ const DocumentUpload = ({ formData, onChange,applicationId }) => {
         { id: 'ssn', label: 'Social Security Number (SSN)', endpoint: '/documents/upload/ssn-card', required: true },
         { id: 'drivers_license', label: 'Driver\'s License', endpoint: '/documents/upload/drivers-license', required: true },
         { id: 'passport', label: 'Passport', endpoint: '/documents/upload/passport', required: false },
-        { id: 'w2_form', label: 'W2 Form', endpoint: '/documents/upload/w2-form', required: true },
-        { id: 'paystubs', label: 'Pay Stubs (Recent 2 months)', endpoint: '/documents/upload/paystubs', required: true },
-        { id: 'bank_statements', label: 'Bank Statements (Recent 3 months)', endpoint: '/documents/upload/bank-statements', required: true }
+        { id: 'w2_form', label: 'W2 Form', endpoint: '/documents/upload/w2', required: true },
+        { id: 'paystubs', label: 'Pay Stubs (Recent 2 months)', endpoint: '/documents/upload/pay-stub', required: true },
+        { id: 'bank_statements', label: 'Bank Statements (Recent 3 months)', endpoint: '/documents/upload/bank-statement', required: true }
     ];
 
     const handleFileChange = async (docId, endpoint, file) => {
@@ -130,8 +130,8 @@ const DocumentUpload = ({ formData, onChange,applicationId }) => {
                 return 'var(--text-muted)';
         }
     };
-     if (!applicationId) {
-       applicationId = '22657323-4072-46db-a30c-9957af9bf95e';  }
+    //  if (!applicationId) {
+    //    applicationId = '22657323-4072-46db-a30c-9957af9bf95e';  }
     
 
     return (

@@ -46,7 +46,7 @@ const EmploymentDetails = ({ formData, onChange }) => {
                     value={employment.employment_type || ''}
                     onChange={handleEmploymentChange}
                     options={employmentTypeOptions}
-                    required
+                 
                 />
 
                 <Select
@@ -55,7 +55,7 @@ const EmploymentDetails = ({ formData, onChange }) => {
                     value={employment.employment_status || ''}
                     onChange={handleEmploymentChange}
                     options={employmentStatusOptions}
-                    required
+                   
                 />
             </div>
 
@@ -65,7 +65,7 @@ const EmploymentDetails = ({ formData, onChange }) => {
                     name="employer_name"
                     value={employment.employer_name || ''}
                     onChange={handleEmploymentChange}
-                    required
+                    
                 />
 
                 <Input
@@ -73,7 +73,7 @@ const EmploymentDetails = ({ formData, onChange }) => {
                     name="job_title"
                     value={employment.job_title || ''}
                     onChange={handleEmploymentChange}
-                    required
+                    
                 />
             </div>
 
@@ -120,7 +120,7 @@ const EmploymentDetails = ({ formData, onChange }) => {
                     value={employment.gross_monthly_income || ''}
                     onChange={handleEmploymentChange}
                     placeholder="0"
-                    required
+                  
                 />
             </div>
 

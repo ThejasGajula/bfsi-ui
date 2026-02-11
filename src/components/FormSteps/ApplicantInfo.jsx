@@ -12,10 +12,10 @@ const ApplicantInfo = ({ formData, onChange }) => {
 
     const suffixOptions = [
         { value: '', label: 'None' },
-        { value: 'Jr.', label: 'Jr.' },
-        { value: 'Sr.', label: 'Sr.' },
-        { value: 'II', label: 'II' },
-        { value: 'III', label: 'III' }
+        { value: 'Mr.', label: 'Mr.' },
+        { value: 'Ms.', label: 'Ms.' },
+        { value: 'Mrs.', label: 'Mrs.' },
+        // { value: 'Miss', label: 'Miss' },
     ];
    const genderOptions=[
         { value: 'MALE', label: 'MALE' },
@@ -87,7 +87,7 @@ const ApplicantInfo = ({ formData, onChange }) => {
                     name="phone_number"
                     value={formData.phone_number || ''}
                     onChange={onChange}
-                    required
+                  
                 />
                  <Select
                     label="Gender"
@@ -95,6 +95,7 @@ const ApplicantInfo = ({ formData, onChange }) => {
                     value={formData.gender || ''}
                     onChange={onChange}
                     options={genderOptions}
+                    required
                 />
                 
             </div>
@@ -108,6 +109,7 @@ const ApplicantInfo = ({ formData, onChange }) => {
                     placeholder="XXXX"
                     maxLength="4"
                     pattern="[0-9]{4}"
+                    required
                 />
 
                 <Input

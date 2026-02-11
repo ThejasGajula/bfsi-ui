@@ -55,6 +55,47 @@ const LoanIntake = () => {
     documents: {}
   });
 
+
+
+  const resetApplication = () => {
+  setApplicationId(null);
+  setCurrentStep(0);
+
+  setFormData({
+    loan: {
+      loan_type: '',
+      credit_type: 'individual',
+      loan_purpose: '',
+      requested_amount: '',
+      requested_term_months: '',
+      preferred_payment_day: '',
+      origination_channel: '',
+      application_status: 'submitted',
+    },
+    applicant: {
+      applicant_role: 'primary',
+      first_name: '',
+      middle_name: '',
+      last_name: '',
+      suffix: '',
+      date_of_birth: '',
+      gender: '',
+      phone_number: '',
+      ssn_last4: '',
+      itin_number: '',
+      citizenship_status: '',
+      email: '',
+      addresses: [],
+      employment: {},
+      incomes: [],
+      assets: [],
+      liabilities: [],
+    },
+    documents: {}
+  });
+};
+
+
   // ----------------------------
   // STEPS
   // ----------------------------
@@ -66,7 +107,7 @@ const LoanIntake = () => {
     { title: 'Additional Income', description: 'Other income sources' },
     { title: 'Assets & Liabilities', description: 'Financial overview' },
     { title: 'Review & Submit', description: 'Final review' },
-    { title: 'Document Upload', description: 'Upload verification docs' }
+    // { title: 'Document Upload', description: 'Upload verification docs' }
   ];
 
   // ----------------------------
@@ -254,37 +295,69 @@ setApplicationId(backendApplicationId);
           transition: 'margin-left 0.3s ease-in-out'
         }}
       >
-        <form onSubmit={handleSubmit}>
-          {renderStep()}
+      <form onSubmit={handleSubmit}>
+  {applicationId ? (
+    <>
+      <DocumentUpload
+        applicationId={applicationId}
+        documents={formData.documents}
+        onChange={(docs) =>
+          setFormData(prev => ({ ...prev, documents: docs }))
+        }
+      />
 
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginTop: 'var(--spacing-xl)',
-              gap: 'var(--spacing-md)'
-            }}
-          >
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={handleBack}
-              disabled={currentStep === 0}
-            >
-              ← Back
-            </Button>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          marginTop: 'var(--spacing-xl)',
+        }}
+      >
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={resetApplication}
+        >
+          Close Application
+        </Button>
+      </div>
+    </>
+  ) : (
+    <>
+      {renderStep()}
 
-            {currentStep === steps.length - 1 ? (
-              <Button type="submit" variant="primary">
-                Submit Application
-              </Button>
-            ) : (
-              <Button type="button" variant="primary" onClick={handleNext}>
-                Next →
-              </Button>
-            )}
-          </div>
-        </form>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginTop: 'var(--spacing-xl)',
+          gap: 'var(--spacing-md)'
+        }}
+      >
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={handleBack}
+          disabled={currentStep === 0}
+        >
+          ← Back
+        </Button>
+
+        {currentStep === 6 ? (
+          <Button type="submit" variant="primary">
+            Submit Form
+          </Button>
+        ) : (
+          <Button type="button" variant="primary" onClick={handleNext}>
+            Next →
+          </Button>
+        )}
+      </div>
+    </>
+  )}
+</form>
+
+
       </div>
     </div>
   );

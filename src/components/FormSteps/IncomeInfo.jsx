@@ -77,7 +77,7 @@ const IncomeInfo = ({ formData, onChange }) => {
                                 updateIncome(index, 'income_type', e.target.value)
                             }
                             options={incomeTypeOptions}
-                            required
+                            
                         />
 
                         <Select
@@ -87,7 +87,7 @@ const IncomeInfo = ({ formData, onChange }) => {
                                 updateIncome(index, 'income_frequency', e.target.value)
                             }
                             options={frequencyOptions}
-                            required
+                            
                         />
                     </div>
 
@@ -99,7 +99,7 @@ const IncomeInfo = ({ formData, onChange }) => {
                             updateIncome(index, 'monthly_amount', e.target.value)
                         }
                         placeholder="0.00"
-                        required
+                       
                     />
 
                     <Input
