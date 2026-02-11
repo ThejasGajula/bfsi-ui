@@ -177,6 +177,11 @@
     background-repeat: no-repeat;
     background-position: right var(--spacing-md) center;
     padding-right: calc(var(--spacing-md) * 2.5);
+    position: relative;
+}
+
+.form-select:focus {
+    z-index: 10;
 }
 
 .form-select option {
@@ -236,6 +241,7 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--spacing-lg);
+    overflow: visible;
 }
 
 @media (max-width: 768px) {
@@ -338,6 +344,7 @@
     margin-bottom: var(--spacing-md);
     position: relative;
     animation: fadeIn 0.3s ease-out;
+    overflow: visible;
 }
 
 .dynamic-list-header {

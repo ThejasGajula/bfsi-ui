@@ -38,6 +38,8 @@ const LoanIntake = () => {
       last_name: '',
       suffix: '',
       date_of_birth: '',
+      gender: '',
+      phone_number: '',
       ssn_last4: '',
       itin_number: '',
       citizenship_status: '',
@@ -70,6 +72,8 @@ const LoanIntake = () => {
   // ----------------------------
   // CHANGE HANDLER (APPLICANT)
   // ----------------------------
+
+ const [applicationId, setApplicationId] = useState(null);
 
 
 
@@ -172,9 +176,15 @@ const LoanIntake = () => {
 
     try {
       const response = await apiClient.post(
-        '/loan_intake/submit_application',
-        payload
-      );
+  '/loan_intake/submit_application',
+  payload
+);
+
+const backendApplicationId = response.data.application_id; // 👈 adjust key if needed
+setApplicationId(backendApplicationId);
+// setApplicationId(response.data.app_id);
+
+
 
       console.log('Loan submitted successfully:', response.data);
       alert('Application submitted successfully!');
@@ -183,7 +193,7 @@ const LoanIntake = () => {
       alert('Submission failed. Please check required fields.');
     }
   };
-
+ 
   // ----------------------------
   // STEP RENDER
   // ----------------------------
@@ -209,7 +219,14 @@ const LoanIntake = () => {
       case 6:
         return <ReviewSubmit formData={formData} onEdit={handleStepClick} />;
       case 7:
-        return <DocumentUpload formData={formData.documents} />;
+        return <DocumentUpload
+  applicationId={applicationId}
+  documents={formData.documents}
+  onChange={(docs) =>
+    setFormData(prev => ({ ...prev, documents: docs }))
+  }
+/>
+
       default:
         return null;
     }

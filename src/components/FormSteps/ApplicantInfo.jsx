@@ -17,7 +17,13 @@ const ApplicantInfo = ({ formData, onChange }) => {
         { value: 'II', label: 'II' },
         { value: 'III', label: 'III' }
     ];
-
+   const genderOptions=[
+        { value: 'MALE', label: 'MALE' },
+        { value: 'FEMALE', label: 'FEMALE' },
+        { value: 'OTHER', label: 'OTHER' },
+        {value:'PREFER_NOT_TO_SAY', label: 'Prefer not to say'},
+        {value:'NON_BINARY', label: 'Non-binary'},
+    ];
     return (
         <div className="card fade-in">
             <div className="card-header">
@@ -76,6 +82,21 @@ const ApplicantInfo = ({ formData, onChange }) => {
                     max={new Date().toISOString().split('T')[0]}
                     required
                 />
+                 <Input
+                    label="Phone Number"
+                    name="phone_number"
+                    value={formData.phone_number || ''}
+                    onChange={onChange}
+                    required
+                />
+                 <Select
+                    label="Gender"
+                    name="gender"
+                    value={formData.gender || ''}
+                    onChange={onChange}
+                    options={genderOptions}
+                />
+                
             </div>
 
             <div className="form-grid-2">

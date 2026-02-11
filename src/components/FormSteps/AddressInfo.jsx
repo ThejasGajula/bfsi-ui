@@ -5,6 +5,14 @@ import '../../styles/components.css';
 
 const AddressInfo = ({ formData, onChange }) => {
     const [addresses, setAddresses] = useState(formData.addresses || []);
+    const STATE_CODES = [
+  "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA",
+  "HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
+  "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
+  "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
+  "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"
+];
+
 
     const addressTypeOptions = [
         { value: 'current', label: 'Current Address' },
@@ -99,14 +107,15 @@ const AddressInfo = ({ formData, onChange }) => {
                             required
                         />
 
-                        <Input
+                        <Select
                             label="State"
                             value={address.state}
-                            onChange={(e) =>
-                                updateAddress(index, 'state', e.target.value)
-                            }
+                            options={STATE_CODES.map((state) => ({ value: state, label: state }))}
+                            onChange={(e) => updateAddress(index, 'state', e.target.value)}
                             required
                         />
+
+
 
                         <Input
                             label="ZIP Code"

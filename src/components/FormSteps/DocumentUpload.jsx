@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 import Button from '../FormElements/Button';
+import apiClient from '../../api/client';
 import '../../styles/components.css';
 
-const DocumentUpload = ({ formData, onChange }) => {
+const DocumentUpload = ({ formData, onChange,applicationId }) => {
     const [uploadStatus, setUploadStatus] = useState({});
     const [uploading, setUploading] = useState({});
-
+   
     const documents = [
-        { id: 'ssn', label: 'Social Security Number (SSN)', endpoint: '/api/upload/ssn', required: true },
-        { id: 'drivers_license', label: 'Driver\'s License', endpoint: '/api/upload/drivers-license', required: true },
-        { id: 'passport', label: 'Passport', endpoint: '/api/upload/passport', required: false },
-        { id: 'w2_form', label: 'W2 Form', endpoint: '/api/upload/w2', required: true },
-        { id: 'paystubs', label: 'Pay Stubs (Recent 2 months)', endpoint: '/api/upload/paystubs', required: true },
-        { id: 'bank_statements', label: 'Bank Statements (Recent 3 months)', endpoint: '/api/upload/bank-statements', required: true }
+        { id: 'ssn', label: 'Social Security Number (SSN)', endpoint: '/documents/upload/ssn-card', required: true },
+        { id: 'drivers_license', label: 'Driver\'s License', endpoint: '/documents/upload/drivers-license', required: true },
+        { id: 'passport', label: 'Passport', endpoint: '/documents/upload/passport', required: false },
+        { id: 'w2_form', label: 'W2 Form', endpoint: '/documents/upload/w2-form', required: true },
+        { id: 'paystubs', label: 'Pay Stubs (Recent 2 months)', endpoint: '/documents/upload/paystubs', required: true },
+        { id: 'bank_statements', label: 'Bank Statements (Recent 3 months)', endpoint: '/documents/upload/bank-statements', required: true }
     ];
 
     const handleFileChange = async (docId, endpoint, file) => {
@@ -23,21 +24,22 @@ const DocumentUpload = ({ formData, onChange }) => {
 
         try {
             // Create FormData for file upload
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('document_type', docId);
+            const uploadFormData = new FormData();
+           uploadFormData.append('application_id', applicationId);
+           uploadFormData.append('file', file);
+           
 
-            // Simulate API call (replace with actual backend endpoint)
-            console.log(`Uploading ${docId} to ${endpoint}`, file);
-
-            // TODO: Replace with actual API call
-            // const response = await fetch(endpoint, {
-            //   method: 'POST',
-            //   body: formData
-            // });
-
-            // Simulate upload delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            // Make API call using apiClient
+            const response = await apiClient.post(endpoint, uploadFormData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                onUploadProgress: (progressEvent) => {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    console.log(`Upload progress for ${docId}: ${percentCompleted}%`);
+                }
+            });
+            console.log(`Successfully uploaded ${docId}:`, response.data);
 
             // Simulate success
             setUploadStatus(prev => ({
@@ -55,7 +57,7 @@ const DocumentUpload = ({ formData, onChange }) => {
                 target: {
                     name: 'documents',
                     value: {
-                        ...formData.documents,
+                        ...(formData?.documents || {}),
                         [docId]: {
                             fileName: file.name,
                             fileSize: file.size,
@@ -66,15 +68,39 @@ const DocumentUpload = ({ formData, onChange }) => {
             });
 
         } catch (error) {
-            setUploadStatus(prev => ({
-                ...prev,
-                [docId]: {
-                    status: 'error',
-                    message: 'Upload failed. Please try again.'
-                }
-            }));
-            console.error(`Error uploading ${docId}:`, error);
-        } finally {
+    let errorMessage = "Upload failed. Please try again.";
+
+    if (error.response && error.response.data) {
+        const data = error.response.data;
+
+        // 🔹 Case 1: detail is an object
+        if (typeof data.detail === "object" && data.detail?.message) {
+            errorMessage = data.detail.message;
+        }
+
+        // 🔹 Case 2: detail is a string
+        else if (typeof data.detail === "string") {
+            errorMessage = data.detail;
+        }
+
+        // 🔹 Case 3: direct message field
+        else if (typeof data.message === "string") {
+            errorMessage = data.message;
+        }
+    }
+
+    setUploadStatus(prev => ({
+        ...prev,
+        [docId]: {
+            status: "error",
+            message: errorMessage
+        }
+    }));
+
+
+    console.error(`Error uploading ${docId}:`, error);
+}
+ finally {
             setUploading(prev => ({ ...prev, [docId]: false }));
         }
     };
@@ -104,6 +130,9 @@ const DocumentUpload = ({ formData, onChange }) => {
                 return 'var(--text-muted)';
         }
     };
+     if (!applicationId) {
+       applicationId = '22657323-4072-46db-a30c-9957af9bf95e';  }
+    
 
     return (
         <div className="card fade-in">
