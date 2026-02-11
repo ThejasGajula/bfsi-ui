@@ -91,6 +91,7 @@ const LoanDetails = ({ formData, onChange }) => {
                     placeholder="1-31"
                     min="1"
                     max="31"
+                    required
                 />
 
                 <Select

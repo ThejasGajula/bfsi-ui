@@ -108,14 +108,14 @@ const AssetsLiabilities = ({ formData, onChange }) => {
                         value={a.asset_type}
                         onChange={(e) => updateAsset(i, 'asset_type', e.target.value)}
                         options={assetTypeOptions}
-                        required
+                        
                     />
 
                     <Input
                         label="Institution Name"
                         value={a.institution_name}
                         onChange={(e) => updateAsset(i, 'institution_name', e.target.value)}
-                        required
+                
                     />
 
                     <Input
@@ -123,7 +123,7 @@ const AssetsLiabilities = ({ formData, onChange }) => {
                         type="number"
                         value={a.value}
                         onChange={(e) => updateAsset(i, 'value', e.target.value)}
-                        required
+                    
                     />
 
                     <Select
@@ -131,7 +131,7 @@ const AssetsLiabilities = ({ formData, onChange }) => {
                         value={a.ownership_type}
                         onChange={(e) => updateAsset(i, 'ownership_type', e.target.value)}
                         options={ownershipOptions}
-                        required
+                    
                     />
 
                     <button className="btn-remove" onClick={() => removeAsset(i)} type="button">
@@ -154,14 +154,14 @@ const AssetsLiabilities = ({ formData, onChange }) => {
                         value={l.liability_type}
                         onChange={(e) => updateLiability(i, 'liability_type', e.target.value)}
                         options={liabilityTypeOptions}
-                        required
+                    
                     />
 
                     <Input
                         label="Creditor Name"
                         value={l.creditor_name}
                         onChange={(e) => updateLiability(i, 'creditor_name', e.target.value)}
-                        required
+                        
                     />
 
                     <Input
@@ -169,7 +169,7 @@ const AssetsLiabilities = ({ formData, onChange }) => {
                         type="number"
                         value={l.outstanding_balance}
                         onChange={(e) => updateLiability(i, 'outstanding_balance', e.target.value)}
-                        required
+                    
                     />
 
                     <Input
@@ -177,7 +177,7 @@ const AssetsLiabilities = ({ formData, onChange }) => {
                         type="number"
                         value={l.monthly_payment}
                         onChange={(e) => updateLiability(i, 'monthly_payment', e.target.value)}
-                        required
+                    
                     />
 
                     <Input
@@ -185,7 +185,7 @@ const AssetsLiabilities = ({ formData, onChange }) => {
                         type="number"
                         value={l.months_remaining}
                         onChange={(e) => updateLiability(i, 'months_remaining', e.target.value)}
-                        required
+                    
                     />
 
                     <Select
@@ -215,7 +215,7 @@ const AssetsLiabilities = ({ formData, onChange }) => {
                             type="number"
                             value={l.days_delinquent}
                             onChange={(e) => updateLiability(i, 'days_delinquent', e.target.value)}
-                            required
+                        
                         />
                     )}
 
