@@ -88,22 +88,25 @@ const AddressInfo = ({ formData, onChange }) => {
                         required
                     />
 
-                    <Input
-                        label="Address Line 1"
-                        value={address.address_line1}
-                        onChange={(e) =>
-                            updateAddress(index, 'address_line1', e.target.value)
-                        }
-                        required
-                    />
+                   <Input
+  label="Address Line 1"
+  value={address.address_line1}
+  onChange={(e) => {
+    const filteredValue = e.target.value.replace(/[^a-zA-Z0-9 ,.]/g, '');
+    updateAddress(index, 'address_line1', filteredValue);
+  }}
+  required
+/>
+
 
                     <div className="form-grid-3">
                         <Input
                             label="City"
                             value={address.city}
-                            onChange={(e) =>
-                                updateAddress(index, 'city', e.target.value)
-                            }
+                            onChange={(e) => {
+                            const filteredValue = e.target.value.replace(/[^a-zA-Z0-9 ]/g, '');
+                            updateAddress(index, 'city', filteredValue);
+  }}
                             required
                         />
 
@@ -111,7 +114,11 @@ const AddressInfo = ({ formData, onChange }) => {
                             label="State"
                             value={address.state}
                             options={STATE_CODES.map((state) => ({ value: state, label: state }))}
-                            onChange={(e) => updateAddress(index, 'state', e.target.value)}
+                            onChange={(e) => {
+
+                        
+                                updateAddress(index, 'state', e.target.value);
+                            }}
                             required
                         />
 
@@ -120,9 +127,10 @@ const AddressInfo = ({ formData, onChange }) => {
                         <Input
                             label="ZIP Code"
                             value={address.zip_code}
-                            onChange={(e) =>
-                                updateAddress(index, 'zip_code', e.target.value)
-                            }
+                            onChange={(e) => {
+                                const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
+                                updateAddress(index, 'zip_code', onlyNumbers)
+                            }}
                             required
                         />
                     </div>
@@ -139,16 +147,21 @@ const AddressInfo = ({ formData, onChange }) => {
 
                     <div className="form-grid-2">
                         <Input
-                            label="Years at Address"
-                            type="number"
-                            min="0"
-                            max="50"
-                            value={address.years_at_address}
-                            onChange={(e) =>
-                                updateAddress(index, 'years_at_address', Number(e.target.value))
-                            }
-                            required
-                        />
+  label="Years at Address"
+  type="text"
+  value={address.years_at_address ?? ''}
+  onChange={(e) => {
+    const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
+
+    updateAddress(
+      index,
+      'years_at_address',
+      onlyNumbers === '' ? '' : Number(onlyNumbers)
+    );
+  }}
+  required
+/>
+
 
                         <Input
                             label="Months at Address"

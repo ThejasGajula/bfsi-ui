@@ -114,7 +114,10 @@ const AssetsLiabilities = ({ formData, onChange }) => {
                     <Input
                         label="Institution Name"
                         value={a.institution_name}
-                        onChange={(e) => updateAsset(i, 'institution_name', e.target.value)}
+                        onChange={(e) => {
+                            const filteredValue=e.target.value.replace(/[^a-zA-Z0-9 ,.]/g,'');
+                            updateAsset(i, 'institution_name', filteredValue);
+                        }}
                 
                     />
 
@@ -122,7 +125,10 @@ const AssetsLiabilities = ({ formData, onChange }) => {
                         label="Estimated Value"
                         type="number"
                         value={a.value}
-                        onChange={(e) => updateAsset(i, 'value', e.target.value)}
+                        onChange={(e) => {
+                            const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
+                            updateAsset(i, 'value', onlyNumbers);
+                        }}
                     
                     />
 

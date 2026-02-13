@@ -64,7 +64,15 @@ const EmploymentDetails = ({ formData, onChange }) => {
                     label="Employer Name"
                     name="employer_name"
                     value={employment.employer_name || ''}
-                    onChange={handleEmploymentChange}
+                    
+                    onChange={(e)=>{                    const filteredValue = e.target.value.replace(/[^a-zA-Z0-9 ,.]/g, '');
+                        handleEmploymentChange({
+                            target:{
+                                name:"employer_name",
+                                value:filteredValue
+                            }
+                        });
+                    }}
                     
                 />
 
@@ -72,7 +80,15 @@ const EmploymentDetails = ({ formData, onChange }) => {
                     label="Job Title"
                     name="job_title"
                     value={employment.job_title || ''}
-                    onChange={handleEmploymentChange}
+                    onChange={(e)=>{
+                        const filteredValue = e.target.value.replace(/[^a-zA-Z0-9 ,.]/g, '');
+                        handleEmploymentChange({
+                            target:{
+                                name:"job_title",
+                                value:filteredValue
+                            }
+                        });
+                    }}
                     
                 />
             </div>
@@ -83,7 +99,15 @@ const EmploymentDetails = ({ formData, onChange }) => {
                     name="employer_phone"
                     type="tel"
                     value={employment.employer_phone || ''}
-                    onChange={handleEmploymentChange}
+                    onChange={(e)=>{
+                        const filteredValue=e.target.value.replace(/[^0-9 +]/g, '');
+                        handleEmploymentChange({
+                            target:{
+                                name:"employer_phone",
+                                value:filteredValue
+                            }
+                        });
+                    }}
                     placeholder="(555) 123-4567"
                 />
 
@@ -100,7 +124,15 @@ const EmploymentDetails = ({ formData, onChange }) => {
                 label="Employer Address"
                 name="employer_address"
                 value={employment.employer_address || ''}
-                onChange={handleEmploymentChange}
+                onChange={(e)=>{
+                    const filteredValue = e.target.value.replace(/[^a-zA-Z0-9 ,.]/g, '');
+                    handleEmploymentChange({
+                        target:{
+                            name:"employer_address",
+                            value:filteredValue
+                        }
+                    });
+                }}
             />
 
             <div className="form-grid-2">
@@ -114,14 +146,25 @@ const EmploymentDetails = ({ formData, onChange }) => {
                 />
 
                 <Input
-                    label="Gross Monthly Income"
-                    name="gross_monthly_income"
-                    type="number"
-                    value={employment.gross_monthly_income || ''}
-                    onChange={handleEmploymentChange}
-                    placeholder="0"
-                  
-                />
+  label="Gross Monthly Income"
+  name="gross_monthly_income"
+  type="text"
+  value={employment.gross_monthly_income || ''}
+  onChange={(e) => {
+    const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
+
+    const numericValue = onlyNumbers === '' ? '' : Number(onlyNumbers);
+
+    handleEmploymentChange({
+      target: {
+        name: "gross_monthly_income",
+        value: numericValue
+      }
+    });
+  }}
+  placeholder="0"
+/>
+
             </div>
 
             <div style={{ display: 'flex', gap: 'var(--spacing-lg)', marginTop: 'var(--spacing-md)' }}>

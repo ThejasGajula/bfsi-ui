@@ -42,25 +42,53 @@ const ApplicantInfo = ({ formData, onChange }) => {
 
             <div className="form-grid-3">
                 <Input
-                    label="First Name"
-                    name="first_name"
-                    value={formData.first_name || ''}
-                    onChange={onChange}
-                    required
-                />
+  label="First Name"
+  name="first_name"
+  value={formData.first_name || ''}
+  onChange={(e) => {
+    const onlyLettersAndNumbers = e.target.value.replace(/[^a-zA-Z0-9 ]/g, '');
+    
+    onChange({
+      target: {
+        name: "first_name",
+        value: onlyLettersAndNumbers
+      }
+    });
+  }}
+  required
+/>
+
 
                 <Input
                     label="Middle Name"
                     name="middle_name"
                     value={formData.middle_name || ''}
-                    onChange={onChange}
+                    onChange={(e) => {
+    const onlyLettersAndNumbers = e.target.value.replace(/[^a-zA-Z0-9 ]/g, '');
+    
+    onChange({
+      target: {
+        name: "middle_name",
+        value: onlyLettersAndNumbers
+      }
+    });
+    }}
                 />
 
                 <Input
                     label="Last Name"
                     name="last_name"
                     value={formData.last_name || ''}
-                    onChange={onChange}
+onChange={(e) => {
+    const onlyLettersAndNumbers = e.target.value.replace(/[^a-zA-Z0-9 ]/g, '');
+    
+    onChange({
+      target: {
+        name: "last_name",
+        value: onlyLettersAndNumbers
+      }
+    });
+    }}
                     required
                 />
             </div>
@@ -86,7 +114,16 @@ const ApplicantInfo = ({ formData, onChange }) => {
                     label="Phone Number"
                     name="phone_number"
                     value={formData.phone_number || ''}
-                    onChange={onChange}
+                    onChange={(e) => {
+    const onlyNumbers = e.target.value.replace(/[^0-9 +]/g, '');
+    
+    onChange({
+      target: {
+        name: "phone_number",
+        value: onlyNumbers
+      }
+    });
+    }}
                   
                 />
                  <Select
@@ -102,13 +139,23 @@ const ApplicantInfo = ({ formData, onChange }) => {
 
             <div className="form-grid-2">
                 <Input
-                    label="SSN (Last 4 Digits)"
-                    name="ssn_last4"
-                    value={formData.ssn_last4 || ''}
-                    onChange={onChange}
-                    placeholder="XXXX"
-                    maxLength="4"
-                    pattern="[0-9]{4}"
+                    label="SSN "
+                    name="ssn_no"
+                    value={formData.ssn_no || ''}
+
+                    onChange={(e) => {
+    const onlyNumbers = e.target.value.replace(/[^0-9 -]/g, '');
+    
+    onChange({
+      target: {
+        name: "ssn_no",
+        value: onlyNumbers
+      }
+    });
+    }}
+                    placeholder="XXXXXXXXX"
+                    maxLength="11"
+                    pattern="[0-9]"
                     required
                 />
 

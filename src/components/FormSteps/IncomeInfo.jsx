@@ -93,11 +93,12 @@ const IncomeInfo = ({ formData, onChange }) => {
 
                     <Input
                         label="Monthly Amount"
-                        type="number"
+                        type="text"
                         value={income.monthly_amount || ''}
-                        onChange={(e) =>
-                            updateIncome(index, 'monthly_amount', e.target.value)
-                        }
+                        onChange={(e) => {
+                            const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
+                            updateIncome(index, 'monthly_amount', onlyNumbers);
+                        }}
                         placeholder="0.00"
                        
                     />
@@ -105,9 +106,11 @@ const IncomeInfo = ({ formData, onChange }) => {
                     <Input
                         label="Description"
                         value={income.description || ''}
-                        onChange={(e) =>
-                            updateIncome(index, 'description', e.target.value)
-                        }
+                        onChange={(e) => {
+                            const filteredValue=e.target.value.replace(/[^a-zA-Z0-9 ,.]/g,'');
+                            updateIncome(index, 'description', filteredValue);
+                        }}
+
                         placeholder="Employer name, rental property, etc."
                     />
                 </div>

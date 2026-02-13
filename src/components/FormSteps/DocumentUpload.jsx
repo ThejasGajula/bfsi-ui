@@ -69,21 +69,27 @@ const DocumentUpload = ({ formData, onChange,applicationId }) => {
 
         } catch (error) {
     let errorMessage = "Upload failed. Please try again.";
+    console.error(`Error uploading ${docId}:`, error);
 
     if (error.response && error.response.data) {
         const data = error.response.data;
 
-        // 🔹 Case 1: detail is an object
-        if (typeof data.detail === "object" && data.detail?.message) {
-            errorMessage = data.detail.message;
+        // Case 1: FastAPI validation error (array)
+        if (Array.isArray(data.detail)) {
+            errorMessage = data.detail.map(err => err.msg).join(", ");
         }
 
-        // 🔹 Case 2: detail is a string
+        // Case 2: detail is string
         else if (typeof data.detail === "string") {
             errorMessage = data.detail;
         }
 
-        // 🔹 Case 3: direct message field
+        // Case 3: detail is object with message
+        else if (typeof data.detail === "object" && data.detail?.message) {
+            errorMessage = data.detail.message;
+        }
+
+        // Case 4: generic message
         else if (typeof data.message === "string") {
             errorMessage = data.message;
         }
@@ -97,9 +103,12 @@ const DocumentUpload = ({ formData, onChange,applicationId }) => {
         }
     }));
 
-
     console.error(`Error uploading ${docId}:`, error);
 }
+
+
+
+   
  finally {
             setUploading(prev => ({ ...prev, [docId]: false }));
         }

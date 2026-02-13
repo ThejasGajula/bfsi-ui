@@ -51,34 +51,62 @@ const LoanDetails = ({ formData, onChange }) => {
             </div>
 
             <Input
-                label="Loan Purpose"
-                name="loan_purpose"
-                value={formData.loan_purpose || ''}
-                onChange={onChange}
-                placeholder="e.g., Home renovation, debt consolidation"
-                required
-            />
+  label="Loan Purpose"
+  name="loan_purpose"
+  value={formData.loan_purpose || ''}
+  onChange={(e) => {
+    const value = e.target.value;
+    const filteredValue = value.replace(/[^a-zA-Z0-9 ,.]/g, '');
+    onChange({
+      target: {
+        name: "loan_purpose",
+        value: filteredValue
+      }
+    });
+  }}
+  placeholder="e.g., Home renovation, debt consolidation"
+  required
+/>
+
 
             <div className="form-grid-2">
                 <Input
-                    label="Requested Amount"
-                    name="requested_amount"
-                    type="number"
-                    value={formData.requested_amount || ''}
-                    onChange={onChange}
-                    placeholder="0"
-                    required
-                />
+  label="Requested Amount"
+  name="requested_amount"
+  type="text"
+  value={formData.requested_amount ?? ''}
+  onChange={(e) => {
+    const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
 
-                <Input
-                    label="Requested Term (Months)"
-                    name="requested_term_months"
-                    type="number"
-                    value={formData.requested_term_months || ''}
-                    onChange={onChange}
-                    placeholder="0"
-                  
-                />
+    onChange({
+      target: {
+        name: "requested_amount",
+        value: onlyNumbers === '' ? '' : Number(onlyNumbers)
+      }
+    });
+  }}
+  placeholder="0"
+  required
+/>
+
+<Input
+  label="Requested Term Months"
+  name="requested_term_months"
+  type="text"
+  value={formData.requested_term_months ?? ''}
+  onChange={(e) => {
+    const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
+
+    onChange({
+      target: {
+        name: "requested_term_months",
+        value: onlyNumbers === '' ? '' : Number(onlyNumbers)
+      }
+    });
+  }}
+  placeholder="0"
+  required
+/>
             </div>
 
             <div className="form-grid-2">

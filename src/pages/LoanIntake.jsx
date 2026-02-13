@@ -11,6 +11,8 @@ import ReviewSubmit from '../components/FormSteps/ReviewSubmit';
 import DocumentUpload from '../components/FormSteps/DocumentUpload';
 import '../styles/components.css';
 import apiClient from '../api/client';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const LoanIntake = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -40,6 +42,7 @@ const LoanIntake = () => {
       date_of_birth: '',
       gender: '',
       phone_number: '',
+      ssn_no:'',
       ssn_last4: '',
       itin_number: '',
       citizenship_status: '',
@@ -81,6 +84,7 @@ const LoanIntake = () => {
       date_of_birth: '',
       gender: '',
       phone_number: '',
+      ssn_no:'',
       ssn_last4: '',
       itin_number: '',
       citizenship_status: '',
@@ -107,7 +111,7 @@ const LoanIntake = () => {
     { title: 'Additional Income', description: 'Other income sources' },
     { title: 'Assets & Liabilities', description: 'Financial overview' },
     { title: 'Review & Submit', description: 'Final review' },
-    // { title: 'Document Upload', description: 'Upload verification docs' }
+    { title: 'Document Upload', description: 'Upload verification docs' }
   ];
 
   // ----------------------------
@@ -173,7 +177,7 @@ const LoanIntake = () => {
   // ----------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const payload = {
       request_id: crypto.randomUUID(),
       callback_url: "",
@@ -189,7 +193,11 @@ const LoanIntake = () => {
       applicants: [
         {
           ...formData.applicant,
-
+            ssn_no: formData.applicant.ssn_no,
+           ssn_last4: formData.applicant.ssn_no
+      ? formData.applicant.ssn_no.replace(/\D/g, "").slice(-4)
+      : "",
+  
           employment:
             Object.keys(formData.applicant.employment || {}).length === 0
               ? null
@@ -214,27 +222,46 @@ const LoanIntake = () => {
         }
       ]
     };
-
+   console.log(payload);
     try {
       const response = await apiClient.post(
   '/loan_intake/submit_application',
   payload
 );
 
-const backendApplicationId = response.data.application_id; // 👈 adjust key if needed
+const backendApplicationId = response.data.application_id || crypto.randomUUID(); // 👈 adjust key if needed
 setApplicationId(backendApplicationId);
 // setApplicationId(response.data.app_id);
 
-
+console.log('Backend Application ID:', backendApplicationId);
 
       console.log('Loan submitted successfully:', response.data);
-      alert('Application submitted successfully!');
+      toast.success("Application submitted successfully!");
     } catch (error) {
-      console.error('Loan submission failed:', error);
-      alert('Submission failed. Please check required fields.');
+  console.error('Loan submission failed:', error);
+  console.log('Error response data:', error.response?.data);
+
+  if (error.response?.data?.detail) {
+    
+    // Case 1: Blocking validation summary (array of errors)
+    if (Array.isArray(error.response.data.detail)) {
+      error.response.data.detail.forEach(err => {
+        toast.error(err.msg || err);
+      });
+    } 
+    
+    // Case 2: Single validation error
+    else {
+      toast.error(error.response.data.detail);
     }
+
+  } else {
+    toast.error("Submission failed. Please try again.");
+  }
+}
+
   };
- 
+  
   // ----------------------------
   // STEP RENDER
   // ----------------------------
@@ -359,6 +386,7 @@ setApplicationId(backendApplicationId);
 
 
       </div>
+       <ToastContainer position="top-right" autoClose={4000} />
     </div>
   );
 };
