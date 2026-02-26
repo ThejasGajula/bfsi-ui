@@ -79,7 +79,7 @@ const DocumentUpload = ({ formData, onChange,applicationId }) => {
         if (Array.isArray(data.detail.mismatches)) {
             errorMessage = data.detail.mismatches.map(err => err.msg).join(", ");
         }
-
+        //to handle case when detail is a string (e.g., "File too large")
         // Case 2: detail is string
         else if (typeof data.detail.mismatches === "string") {
             errorMessage = data.detail.mismatches;
