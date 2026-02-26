@@ -13,7 +13,8 @@ const DocumentUpload = ({ formData, onChange,applicationId }) => {
         { id: 'passport', label: 'Passport', endpoint: '/documents/upload/passport', required: false },
         { id: 'w2_form', label: 'W2 Form', endpoint: '/documents/upload/w2', required: true },
         { id: 'paystubs', label: 'Pay Stubs (Recent 2 months)', endpoint: '/documents/upload/pay-stub', required: true },
-        { id: 'bank_statements', label: 'Bank Statements (Recent 3 months)', endpoint: '/documents/upload/bank-statement', required: true }
+        { id: 'bank_statements', label: 'Bank Statements (Recent 3 months)', endpoint: '/documents/upload/bank-statement', required: true },
+        {id:'itr', label: 'Income Tax Return (ITR)', endpoint: '/documents/upload/itr', required: false }
     ];
 
     const handleFileChange = async (docId, endpoint, file) => {
@@ -75,18 +76,18 @@ const DocumentUpload = ({ formData, onChange,applicationId }) => {
         const data = error.response.data;
 
         // Case 1: FastAPI validation error (array)
-        if (Array.isArray(data.detail)) {
-            errorMessage = data.detail.map(err => err.msg).join(", ");
+        if (Array.isArray(data.mismatch)) {
+            errorMessage = data.mismatch.map(err => err.msg).join(", ");
         }
 
         // Case 2: detail is string
-        else if (typeof data.detail === "string") {
-            errorMessage = data.detail;
+        else if (typeof data.mismatch === "string") {
+            errorMessage = data.mismatch;
         }
 
         // Case 3: detail is object with message
-        else if (typeof data.detail === "object" && data.detail?.message) {
-            errorMessage = data.detail.message;
+        else if (typeof data.mismatch === "object" && data.mismatch?.message) {
+            errorMessage = data.mismatch.message;
         }
 
         // Case 4: generic message

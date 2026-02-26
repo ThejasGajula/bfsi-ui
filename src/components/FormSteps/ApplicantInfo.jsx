@@ -153,7 +153,7 @@ onChange={(e) => {
       }
     });
     }}
-                    placeholder="XXXXXXXXX"
+                    placeholder="XXX-XX-XXXX"
                     maxLength="11"
                     pattern="[0-9]"
                     required
