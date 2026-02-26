@@ -76,18 +76,18 @@ const DocumentUpload = ({ formData, onChange,applicationId }) => {
         const data = error.response.data;
 
         // Case 1: FastAPI validation error (array)
-        if (Array.isArray(data.mismatches)) {
-            errorMessage = data.mismatches.map(err => err.msg).join(", ");
+        if (Array.isArray(data.detail.mismatches)) {
+            errorMessage = data.detail.mismatches.map(err => err.msg).join(", ");
         }
 
         // Case 2: detail is string
-        else if (typeof data.mismatches === "string") {
-            errorMessage = data.mismatches;
+        else if (typeof data.detail.mismatches === "string") {
+            errorMessage = data.detail.mismatches;
         }
 
         // Case 3: detail is object with message
-        else if (typeof data.mismatches === "object" && data.mismatches?.message) {
-            errorMessage = data.mismatches.message;
+        else if (typeof data.detail.mismatches === "object" && data.detail.mismatches?.message) {
+            errorMessage = data.detail.message;
         }
 
         // Case 4: generic message
