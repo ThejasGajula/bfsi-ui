@@ -3,7 +3,7 @@ import Button from '../FormElements/Button';
 import apiClient from '../../api/client';
 import '../../styles/components.css';
 
-const DocumentUpload = ({ formData, onChange,applicationId }) => {
+const DocumentUpload = ({ formData, onChange, applicationId, onContinue }) => {
     const [uploadStatus, setUploadStatus] = useState({});
     const [uploading, setUploading] = useState({});
    
@@ -140,9 +140,9 @@ const DocumentUpload = ({ formData, onChange,applicationId }) => {
                 return 'var(--text-muted)';
         }
     };
-    //  if (!applicationId) {
-    //    applicationId = '22657323-4072-46db-a30c-9957af9bf95e';  }
-    
+    const requiredDocumentsUploaded = documents
+        .filter((doc) => doc.required)
+        .every((doc) => uploadStatus[doc.id]?.status === 'success');
 
     return (
         <div className="card fade-in">
@@ -254,6 +254,21 @@ const DocumentUpload = ({ formData, onChange,applicationId }) => {
                     )}
                 </div>
             ))}
+
+            <div style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                marginTop: 'var(--spacing-xl)'
+            }}>
+                <Button
+                    type="button"
+                    variant="primary"
+                    onClick={onContinue}
+                    disabled={!requiredDocumentsUploaded}
+                >
+                    Continue To Verification
+                </Button>
+            </div>
 
             <style>{`
         @keyframes progress {
