@@ -1,48 +1,74 @@
-import React, { useCallback, useState } from 'react';
-import { toast } from 'react-toastify';
-import apiClient from '../api/client';
-import Sidebar from '../components/Sidebar';
-import Button from '../components/FormElements/Button';
-import ApplicantInfo from '../components/FormSteps/ApplicantInfo';
-import AssetsLiabilities from '../components/FormSteps/AssetsLiabilities';
-import EmploymentDetails from '../components/FormSteps/EmploymentDetails';
-import AddressInfo from '../components/FormSteps/AddressInfo';
-import IncomeInfo from '../components/FormSteps/IncomeInfo';
-import LoanDetails from '../components/FormSteps/LoanDetails';
-import ReviewSubmit from '../components/FormSteps/ReviewSubmit';
-import DocumentUpload from '../components/FormSteps/DocumentUpload';
-import DecisionScreen from '../components/Pipeline/DecisionScreen';
-import PipelineScreen from '../components/Pipeline/PipelineScreen';
-import '../styles/components.css';
-import '../styles/pipeline.css';
+import React, { useCallback, useState } from "react";
+import { isFillDefaults } from "../config/env";
+import { toast } from "react-toastify";
+import apiClient from "../api/client";
+import Sidebar from "../components/Sidebar";
+import Button from "../components/FormElements/Button";
+import ApplicantInfo from "../components/FormSteps/ApplicantInfo";
+import AssetsLiabilities from "../components/FormSteps/AssetsLiabilities";
+import EmploymentDetails from "../components/FormSteps/EmploymentDetails";
+import AddressInfo from "../components/FormSteps/AddressInfo";
+import IncomeInfo from "../components/FormSteps/IncomeInfo";
+import LoanDetails from "../components/FormSteps/LoanDetails";
+import ReviewSubmit from "../components/FormSteps/ReviewSubmit";
+import DocumentUpload from "../components/FormSteps/DocumentUpload";
+import DecisionScreen from "../components/Pipeline/DecisionScreen";
+import PipelineScreen from "../components/Pipeline/PipelineScreen";
+import "../styles/components.css";
+import "../styles/pipeline.css";
 
-const initialFormData = {
+const defaultFormData = {
   loan: {
-    loan_type: '',
-    credit_type: 'individual',
-    loan_purpose: '',
-    requested_amount: '',
-    requested_term_months: '',
-    preferred_payment_day: '',
-    origination_channel: '',
-    application_status: 'submitted',
+    loan_type: "personal",
+    credit_type: "individual",
+    loan_purpose: "Purchase of house",
+    requested_amount: "250000",
+    requested_term_months: "240",
+    preferred_payment_day: "5",
+    origination_channel: "online",
+    application_status: "submitted",
   },
   applicant: {
-    applicant_role: 'primary',
-    first_name: '',
-    middle_name: '',
-    last_name: '',
-    suffix: '',
-    date_of_birth: '',
-    gender: '',
-    phone_number: '',
-    ssn_no: '',
-    ssn_last4: '',
-    itin_number: '',
-    citizenship_status: '',
-    email: '',
-    addresses: [],
-    employment: {},
+    applicant_role: "primary",
+    first_name: "John",
+    middle_name: "A.",
+    last_name: "Doe",
+    suffix: "Mr.",
+    date_of_birth: "1988-10-17",
+    gender: "MALE",
+    phone_number: "555-123-4567",
+    ssn_no: "123-45-6789",
+    ssn_last4: "6789",
+    itin_number: "",
+    citizenship_status: "US Citizen",
+    email: `john${Date.now()}@example.com`,  // new email every time to avoid backend duplicate checks during development
+    addresses: [
+      {
+        address_type: "permanent",
+        address_line1: "123 Main St",
+        address_line2: "Apt 4B",
+        city: "Metropolis",
+        state: "NY",
+        zip_code: "10001",
+        country: "USA",
+        housing_status: "own",
+        years_at_address: "3",
+        months_at_address: "0",
+      },
+    ],
+    employment: {
+      employment_type: "salaried",
+      employment_status: "employed",
+      employer_name: "Acme Corp",
+      job_title: "Software Engineer",
+      start_date: "2015-06-01",
+      end_date: "",
+      income: "120000",
+      employer_phone: "555-987-6543",
+      employer_address: "456 Corporate Blvd, Metropolis, NY 10002",
+      experience: "5",
+      gross_monthly_income: "10000",
+    },
     incomes: [],
     assets: [],
     liabilities: [],
@@ -50,14 +76,50 @@ const initialFormData = {
   documents: {},
 };
 
+const initialFormData = isFillDefaults
+  ? defaultFormData
+  : {
+      loan: {
+        loan_type: "",
+        credit_type: "individual",
+        loan_purpose: "",
+        requested_amount: "",
+        requested_term_months: "",
+        preferred_payment_day: "",
+        origination_channel: "",
+        application_status: "submitted",
+      },
+      applicant: {
+        applicant_role: "primary",
+        first_name: "",
+        middle_name: "",
+        last_name: "",
+        suffix: "",
+        date_of_birth: "",
+        gender: "",
+        phone_number: "",
+        ssn_no: "",
+        ssn_last4: "",
+        itin_number: "",
+        citizenship_status: "",
+        email: "",
+        addresses: [],
+        employment: {},
+        incomes: [],
+        assets: [],
+        liabilities: [],
+      },
+      documents: {},
+    };
+
 const steps = [
-  { title: 'Loan Details', description: 'Basic loan information' },
-  { title: 'Applicant Info', description: 'Personal details' },
-  { title: 'Address', description: 'Contact information' },
-  { title: 'Employment', description: 'Work details' },
-  { title: 'Additional Income', description: 'Other income sources' },
-  { title: 'Assets & Liabilities', description: 'Financial overview' },
-  { title: 'Review & Submit', description: 'Final review' },
+  { title: "Loan Details", description: "Basic loan information" },
+  { title: "Applicant Info", description: "Personal details" },
+  { title: "Address", description: "Contact information" },
+  { title: "Employment", description: "Work details" },
+  { title: "Additional Income", description: "Other income sources" },
+  { title: "Assets & Liabilities", description: "Financial overview" },
+  { title: "Review & Submit", description: "Final review" },
 ];
 
 const LoanIntake = () => {
@@ -93,7 +155,7 @@ const LoanIntake = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === 'documents') {
+    if (name === "documents") {
       setFormData((prev) => ({
         ...prev,
         documents: value,
@@ -113,20 +175,20 @@ const LoanIntake = () => {
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep((step) => step + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const handleBack = () => {
     if (currentStep > 0) {
       setCurrentStep((step) => step - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const handleStepClick = (stepIndex) => {
     setCurrentStep(stepIndex);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleToggleCollapse = () => {
@@ -138,7 +200,7 @@ const LoanIntake = () => {
 
     const payload = {
       request_id: crypto.randomUUID(),
-      callback_url: '',
+      callback_url: "",
       app_id: crypto.randomUUID(),
       payload: {},
       ...formData.loan,
@@ -150,8 +212,8 @@ const LoanIntake = () => {
           ...formData.applicant,
           ssn_no: formData.applicant.ssn_no,
           ssn_last4: formData.applicant.ssn_no
-            ? formData.applicant.ssn_no.replace(/\D/g, '').slice(-4)
-            : '',
+            ? formData.applicant.ssn_no.replace(/\D/g, "").slice(-4)
+            : "",
           employment:
             Object.keys(formData.applicant.employment || {}).length === 0
               ? null
@@ -175,16 +237,20 @@ const LoanIntake = () => {
     };
 
     try {
-      const response = await apiClient.post('/loan_intake/submit_application', payload);
-      const backendApplicationId = response.data.application_id || crypto.randomUUID();
+      const response = await apiClient.post(
+        "/loan_intake/submit_application",
+        payload,
+      );
+      const backendApplicationId =
+        response.data.application_id || crypto.randomUUID();
 
       setApplicationId(backendApplicationId);
       setDocumentsComplete(false);
       setPipelineComplete(false);
       setPipelineDecision(null);
-      toast.success('Application submitted successfully!');
+      toast.success("Application submitted successfully!");
     } catch (error) {
-      console.error('Loan submission failed:', error);
+      console.error("Loan submission failed:", error);
 
       if (error.response?.data?.detail) {
         if (Array.isArray(error.response.data.detail)) {
@@ -195,7 +261,7 @@ const LoanIntake = () => {
           toast.error(error.response.data.detail);
         }
       } else {
-        toast.error('Submission failed. Please try again.');
+        toast.error("Submission failed. Please try again.");
       }
     }
   };
@@ -205,39 +271,99 @@ const LoanIntake = () => {
     setPipelineComplete(true);
   }, []);
 
-  const handleDocumentsComplete = useCallback(() => {
-    setDocumentsComplete(true);
-    toast.success('Documents uploaded successfully. Starting verification.');
-  }, []);
+  // Triggers orchestrator and advances to pipeline on success
+  const handleDocumentsComplete = useCallback(async () => {
+    // Build raw_application to match backend schema
+    const { loan, applicant } = formData;
+    const raw_application = {
+      ...loan,
+      applicants: [
+        {
+          ...applicant,
+          incomes: (applicant.incomes || []).map((income) => ({
+            ...income,
+            monthly_amount: Number(income.monthly_amount),
+          })),
+          assets: (applicant.assets || []).map((asset) => ({
+            ...asset,
+            value: Number(asset.value),
+          })),
+          liabilities: (applicant.liabilities || []).map((liability) => ({
+            ...liability,
+            outstanding_balance: Number(liability.outstanding_balance),
+            monthly_payment: Number(liability.monthly_payment),
+            months_remaining: Number(liability.months_remaining),
+          })),
+        },
+      ],
+    };
+    try {
+      await apiClient.post("/loan_intake/trigger_orchestrator", {
+        application_id: applicationId,
+        raw_application,
+      });
+      setDocumentsComplete(true);
+      toast.success("Documents uploaded successfully. Starting verification.");
+    } catch (error) {
+      console.error("Failed to trigger orchestrator:", error);
+      toast.error("Failed to start verification. Please try again.");
+    }
+  }, [applicationId, formData]);
 
   const handleDecisionConfirm = useCallback(
     (choice) => {
-      const selectedTerms = choice === 'counter' ? pipelineDecision?.counter : pipelineDecision?.requested;
-      console.log('Offer accepted:', { applicationId, choice, selectedTerms });
-      toast.success('Offer selection captured. API confirmation can be wired in next.');
+      const selectedTerms =
+        choice === "counter"
+          ? pipelineDecision?.counter
+          : pipelineDecision?.requested;
+      console.log("Offer accepted:", { applicationId, choice, selectedTerms });
+      toast.success(
+        "Offer selection captured. API confirmation can be wired in next.",
+      );
     },
-    [applicationId, pipelineDecision]
+    [applicationId, pipelineDecision],
   );
 
   const handleDecisionDecline = useCallback(() => {
-    toast.info('All offers declined. Starting a new application.');
+    toast.info("All offers declined. Starting a new application.");
     resetApplication();
   }, [resetApplication]);
 
   const renderStep = () => {
     switch (currentStep) {
       case 0:
-        return <LoanDetails formData={formData.loan} onChange={handleLoanChange} />;
+        return (
+          <LoanDetails formData={formData.loan} onChange={handleLoanChange} />
+        );
       case 1:
-        return <ApplicantInfo formData={formData.applicant} onChange={handleChange} />;
+        return (
+          <ApplicantInfo
+            formData={formData.applicant}
+            onChange={handleChange}
+          />
+        );
       case 2:
-        return <AddressInfo formData={formData.applicant} onChange={handleChange} />;
+        return (
+          <AddressInfo formData={formData.applicant} onChange={handleChange} />
+        );
       case 3:
-        return <EmploymentDetails formData={formData.applicant} onChange={handleChange} />;
+        return (
+          <EmploymentDetails
+            formData={formData.applicant}
+            onChange={handleChange}
+          />
+        );
       case 4:
-        return <IncomeInfo formData={formData.applicant} onChange={handleChange} />;
+        return (
+          <IncomeInfo formData={formData.applicant} onChange={handleChange} />
+        );
       case 5:
-        return <AssetsLiabilities formData={formData.applicant} onChange={handleChange} />;
+        return (
+          <AssetsLiabilities
+            formData={formData.applicant}
+            onChange={handleChange}
+          />
+        );
       case 6:
         return <ReviewSubmit formData={formData} onEdit={handleStepClick} />;
       default:
@@ -247,7 +373,7 @@ const LoanIntake = () => {
 
   if (applicationId && pipelineComplete && pipelineDecision) {
     return (
-      <div style={{ minHeight: '100vh', padding: 'var(--spacing-2xl)' }}>
+      <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
         <DecisionScreen
           decision={pipelineDecision}
           onConfirm={handleDecisionConfirm}
@@ -260,7 +386,7 @@ const LoanIntake = () => {
 
   if (applicationId && !documentsComplete) {
     return (
-      <div style={{ minHeight: '100vh', padding: 'var(--spacing-2xl)' }}>
+      <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
         <DocumentUpload
           formData={formData}
           onChange={handleChange}
@@ -273,14 +399,17 @@ const LoanIntake = () => {
 
   if (applicationId && documentsComplete && !pipelineComplete) {
     return (
-      <div style={{ minHeight: '100vh', padding: 'var(--spacing-2xl)' }}>
-        <PipelineScreen applicationId={applicationId} onComplete={handlePipelineComplete} />
+      <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
+        <PipelineScreen
+          applicationId={applicationId}
+          onComplete={handlePipelineComplete}
+        />
       </div>
     );
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
+    <div style={{ display: "flex", minHeight: "100vh" }}>
       <Sidebar
         currentStep={currentStep}
         steps={steps}
@@ -291,11 +420,11 @@ const LoanIntake = () => {
 
       <div
         style={{
-          marginLeft: isCollapsed ? '60px' : '280px',
+          marginLeft: isCollapsed ? "60px" : "280px",
           flex: 1,
-          padding: 'var(--spacing-2xl)',
-          maxWidth: '1200px',
-          transition: 'margin-left 0.3s ease-in-out',
+          padding: "var(--spacing-2xl)",
+          maxWidth: "1200px",
+          transition: "margin-left 0.3s ease-in-out",
         }}
       >
         <form onSubmit={handleSubmit}>
@@ -303,10 +432,10 @@ const LoanIntake = () => {
 
           <div
             style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginTop: 'var(--spacing-xl)',
-              gap: 'var(--spacing-md)',
+              display: "flex",
+              justifyContent: "space-between",
+              marginTop: "var(--spacing-xl)",
+              gap: "var(--spacing-md)",
             }}
           >
             <Button

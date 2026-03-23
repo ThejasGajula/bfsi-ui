@@ -264,7 +264,7 @@ const DocumentUpload = ({ formData, onChange, applicationId, onContinue }) => {
                     type="button"
                     variant="primary"
                     onClick={onContinue}
-                    disabled={!requiredDocumentsUploaded}
+                    // disabled={!requiredDocumentsUploaded}
                 >
                     Continue To Verification
                 </Button>
