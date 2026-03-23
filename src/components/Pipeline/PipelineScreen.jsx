@@ -36,12 +36,42 @@ const getElapsed = (data) => {
 
 const normalizeTerminalDecision = (data) => {
   const details = data?.details || {};
-  const decision =
+
+  const rawDecision =
     details.decision ||
+    data.decision ||
     (data.event === 'counter_offer_pending' ? 'COUNTER_OFFER' : null) ||
     (data.event === 'funds_disbursed' ? 'DISBURSED' : null) ||
-    (data.event === 'application_declined' || data.event === 'kyc_failed' ? 'REJECTED' : null) ||
+    (data.event === 'application_declined' || data.event === 'kyc_failed' ? 'DECLINED' : null) ||
     (data.status === 'failed' ? 'ERROR' : 'DECISION_COMPLETE');
+
+  // Normalize backend short-form strings to UI constants
+  const decision =
+    rawDecision === 'APPROVE' ? 'APPROVED' :
+    rawDecision === 'DECLINE' ? 'DECLINED' :
+    rawDecision;
+
+  // Counter offer options live under details.counter_offer_options
+  const counterOfferOptions = (details.counter_offer_options || []).map((opt) => ({
+    option_id: opt.offer_id,
+    description: opt.label,
+    amount: opt.principal_amount,
+    term_months: opt.tenure_months,
+    interest_rate: opt.interest_rate,
+    monthly_payment: opt.monthly_emi,
+    disbursement_amount: opt.disbursement_amount,
+    total_repayment: opt.total_repayment,
+  }));
+
+  // Approved terms from APPLICATION_APPROVED details
+  const approvedTerms = (decision === 'APPROVED') ? {
+    amount: details.approved_amount,
+    term_months: details.approved_tenure_months,
+    interest_rate: details.interest_rate,
+    monthly_payment: details.monthly_emi,
+    processing_fee: details.processing_fee,
+    terms_summary: details.terms_summary,
+  } : null;
 
   return {
     decision,
@@ -49,6 +79,8 @@ const normalizeTerminalDecision = (data) => {
     reason: details.reason || data.message,
     requested: details.requested || details.offer || null,
     counter: details.counter || null,
+    approvedTerms,
+    counterOfferOptions: counterOfferOptions.length > 0 ? counterOfferOptions : null,
     disbursementReceipt: details.disbursement_receipt || null,
     application_id: data.application_id,
   };
@@ -59,11 +91,9 @@ const PipelineScreen = ({ applicationId, onComplete }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    setStages(markActive(createInitialStages(PIPELINE_STAGES), 0));
-    setError(null);
-
     const unsubscribe = subscribeToPipeline(
       applicationId,
+      // eslint-disable-next-line no-unused-vars
       ({ event, data }) => {
         setError(null);
         const stageIndex = PIPELINE_STAGES.findIndex((stage) => stage.backendStage === data.stage);

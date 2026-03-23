@@ -1,5 +1,5 @@
 const DEMO_NETWORK_DELAY_MS = 900;
-const COUNTER_OFFER_THRESHOLD = 100000;
+const COUNTER_OFFER_THRESHOLD = 0; // demo always showcases counter offer flow
 const demoApplications = new Map();
 
 function wait(ms) {
@@ -101,6 +101,10 @@ export async function demoApiAdapter(config) {
       message: 'Demo submission completed successfully.',
       decision_preview: decision,
     });
+  }
+
+  if (config.url === '/loan_intake/trigger_orchestrator' && config.method === 'post') {
+    return buildResponse(config, { status: 'ok', message: 'Demo orchestrator triggered.' });
   }
 
   if (config.url?.startsWith('/documents/upload/') && config.method === 'post') {

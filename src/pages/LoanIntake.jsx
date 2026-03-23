@@ -22,7 +22,7 @@ const defaultFormData = {
     loan_type: "personal",
     credit_type: "individual",
     loan_purpose: "Purchase of house",
-    requested_amount: "250000",
+    requested_amount: "10000",
     requested_term_months: "240",
     preferred_payment_day: "5",
     origination_channel: "online",
@@ -37,7 +37,7 @@ const defaultFormData = {
     date_of_birth: "1988-10-17",
     gender: "MALE",
     phone_number: "555-123-4567",
-    ssn_no: "123-45-6789",
+    ssn_no: "555-45-6789",
     ssn_last4: "6789",
     itin_number: "",
     citizenship_status: "US Citizen",
@@ -69,8 +69,20 @@ const defaultFormData = {
       experience: "5",
       gross_monthly_income: "10000",
     },
-    incomes: [],
-    assets: [],
+    incomes: [
+      {
+        income_type: "salary",
+        description: "Primary job income",
+        monthly_amount: "10000",
+        income_frequency: "monthly",
+      }
+    ],
+    assets: [{
+      asset_type: "checking",
+      "institution_name": "Bank of Metropolis",
+      "value": "15000",
+      "ownership_type": "individual",
+    }],
     liabilities: [],
   },
   documents: {},
@@ -311,17 +323,11 @@ const LoanIntake = () => {
   }, [applicationId, formData]);
 
   const handleDecisionConfirm = useCallback(
-    (choice) => {
-      const selectedTerms =
-        choice === "counter"
-          ? pipelineDecision?.counter
-          : pipelineDecision?.requested;
-      console.log("Offer accepted:", { applicationId, choice, selectedTerms });
-      toast.success(
-        "Offer selection captured. API confirmation can be wired in next.",
-      );
+    (selectedTerms) => {
+      console.log("Offer accepted:", { applicationId, selectedTerms });
+      toast.success("Offer accepted. Proceeding to disbursement.");
     },
-    [applicationId, pipelineDecision],
+    [applicationId],
   );
 
   const handleDecisionDecline = useCallback(() => {
@@ -401,6 +407,7 @@ const LoanIntake = () => {
     return (
       <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
         <PipelineScreen
+          key={applicationId}
           applicationId={applicationId}
           onComplete={handlePipelineComplete}
         />
