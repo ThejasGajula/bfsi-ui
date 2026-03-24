@@ -52,13 +52,15 @@ const normalizeTerminalDecision = (data) => {
     rawDecision;
 
   // Counter offer options live under details.counter_offer_options
-  const counterOfferOptions = (details.counter_offer_options || []).map((opt) => ({
+  const counterOfferOptions = (
+    details.counter_offer_options.generated_options || []
+  ).map((opt) => ({
     option_id: opt.offer_id,
     description: opt.label,
-    amount: opt.principal_amount,
-    term_months: opt.tenure_months,
-    interest_rate: opt.interest_rate,
-    monthly_payment: opt.monthly_emi,
+    amount: opt.proposed_amount,
+    term_months: opt.proposed_tenure_months,
+    interest_rate: opt.proposed_interest_rate,
+    monthly_payment: opt.monthly_payment_emi,
     disbursement_amount: opt.disbursement_amount,
     total_repayment: opt.total_repayment,
   }));

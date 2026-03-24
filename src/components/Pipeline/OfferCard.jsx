@@ -27,7 +27,7 @@ const OfferCard = ({ title, terms, isHighlighted = false, onAccept, ctaLabel }) 
         <OfferRow label="Loan Amount" value={formatCurrency(terms.amount)} />
         <OfferRow label="Term" value={`${terms.term_months} months`} />
         <OfferRow label="Interest Rate" value={`${terms.interest_rate}% APR`} />
-        <OfferRow label="Monthly Payment" value={`${formatCurrency(terms.monthly_payment)}/mo`} large />
+        {/* <OfferRow label="Monthly Payment" value={`${formatCurrency(terms.monthly_payment)}/mo`} large /> */}
       </dl>
       {onAccept ? (
         <Button type="button" variant="primary" onClick={onAccept}>
