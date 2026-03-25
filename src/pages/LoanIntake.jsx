@@ -13,7 +13,9 @@ import LoanDetails from "../components/FormSteps/LoanDetails";
 import ReviewSubmit from "../components/FormSteps/ReviewSubmit";
 import DocumentUpload from "../components/FormSteps/DocumentUpload";
 import DecisionScreen from "../components/Pipeline/DecisionScreen";
+import DisbursementReceiptScreen from "../components/Pipeline/DisbursementReceiptScreen";
 import PipelineScreen from "../components/Pipeline/PipelineScreen";
+import { callDisburse } from "../api/disbursementApi";
 import "../styles/components.css";
 import "../styles/pipeline.css";
 
@@ -142,12 +144,16 @@ const LoanIntake = () => {
   const [documentsComplete, setDocumentsComplete] = useState(false);
   const [pipelineComplete, setPipelineComplete] = useState(false);
   const [pipelineDecision, setPipelineDecision] = useState(null);
+  const [disbursementLoading, setDisbursementLoading] = useState(false);
+  const [disbursementReceipt, setDisbursementReceipt] = useState(null);
 
   const resetApplication = useCallback(() => {
     setApplicationId(null);
     setDocumentsComplete(false);
     setPipelineComplete(false);
     setPipelineDecision(null);
+    setDisbursementLoading(false);
+    setDisbursementReceipt(null);
     setCurrentStep(0);
     setFormData(initialFormData);
   }, []);
@@ -323,9 +329,31 @@ const LoanIntake = () => {
   }, [applicationId, formData]);
 
   const handleDecisionConfirm = useCallback(
-    (selectedTerms) => {
-      console.log("Offer accepted:", { applicationId, selectedTerms });
-      toast.success("Offer accepted. Proceeding to disbursement.");
+    async (selectedTerms) => {
+      const approvedAmount = Number(selectedTerms.amount || selectedTerms.approved_amount || 0);
+      const payload = {
+        application_id: applicationId,
+        approved_amount: approvedAmount,
+        approved_tenure_months: Number(selectedTerms.term_months || selectedTerms.approved_tenure_months || 0),
+        interest_rate: Number(selectedTerms.interest_rate || 0),
+        disbursement_amount: Number(
+          selectedTerms.disbursement_amount ||
+          (approvedAmount - (approvedAmount * 0.02))
+        ),
+        explanation: selectedTerms.terms_summary || selectedTerms.description || null,
+      };
+
+      setDisbursementLoading(true);
+      try {
+        const receipt = await callDisburse(payload);
+        setDisbursementReceipt(receipt);
+        toast.success("Funds disbursed successfully!");
+      } catch (error) {
+        console.error("Disbursement failed:", error);
+        toast.error(error.response?.data?.detail || "Disbursement failed. Please try again.");
+      } finally {
+        setDisbursementLoading(false);
+      }
     },
     [applicationId],
   );
@@ -378,6 +406,33 @@ const LoanIntake = () => {
   };
 
   if (applicationId && pipelineComplete && pipelineDecision) {
+    if (disbursementReceipt) {
+      return (
+        <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
+          <DisbursementReceiptScreen receipt={disbursementReceipt} onReset={resetApplication} />
+        </div>
+      );
+    }
+
+    if (disbursementLoading) {
+      return (
+        <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
+          <div className="pipeline-shell fade-in">
+            <div className="card decision-screen" style={{ textAlign: "center" }}>
+              <div className="decision-hero">
+                <span className="decision-badge">Processing</span>
+                <h2 className="card-title">Disbursing Funds</h2>
+                <p className="card-subtitle">Executing fund transfer and generating your receipt…</p>
+              </div>
+              <div style={{ margin: "var(--spacing-xl) auto", width: 40, height: 40,
+                border: "3px solid var(--border-color)", borderTopColor: "var(--primary-color)",
+                borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div style={{ minHeight: "100vh", padding: "var(--spacing-2xl)" }}>
         <DecisionScreen

@@ -123,6 +123,86 @@ export async function demoApiAdapter(config) {
     });
   }
 
+  if (config.url === '/disburse' && config.method === 'post') {
+    const body = getRequestBody(config.data);
+    const approvedAmount = Number(body.approved_amount) || 10000;
+    const tenure = Number(body.approved_tenure_months) || 36;
+    const rate = Number(body.interest_rate) || 10.9;
+    const disbursementAmount = Number(body.disbursement_amount) || Math.round(approvedAmount * 0.98);
+    const originationFee = Math.round((approvedAmount - disbursementAmount) * 100) / 100;
+
+    const monthlyRate = rate / 100 / 12;
+    const emi = Math.round(
+      (approvedAmount * monthlyRate * Math.pow(1 + monthlyRate, tenure)) /
+      (Math.pow(1 + monthlyRate, tenure) - 1)
+    );
+    const totalRepayment = Math.round(emi * tenure);
+    const totalInterest = Math.round(totalRepayment - approvedAmount);
+
+    const today = new Date();
+    const firstEmiDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    const firstEmiDateStr = firstEmiDate.toISOString().split('T')[0];
+
+    const buildInstallment = (n, openingBalance) => {
+      const interest = Math.round(openingBalance * monthlyRate * 100) / 100;
+      const principal = Math.round((emi - interest) * 100) / 100;
+      const closingBalance = Math.max(0, Math.round((openingBalance - principal) * 100) / 100);
+      const dueDate = new Date(firstEmiDate);
+      dueDate.setMonth(dueDate.getMonth() + n - 1);
+      return {
+        installment_number: n,
+        due_date: dueDate.toISOString().split('T')[0],
+        opening_balance: Math.round(openingBalance * 100) / 100,
+        emi_amount: emi,
+        principal_component: principal,
+        interest_component: interest,
+        closing_balance: closingBalance,
+      };
+    };
+
+    const schedulePreview = [];
+    let balance = approvedAmount;
+    for (let i = 1; i <= Math.min(3, tenure); i++) {
+      const inst = buildInstallment(i, balance);
+      schedulePreview.push(inst);
+      balance = inst.closing_balance;
+    }
+    if (tenure > 3) {
+      const lastDue = new Date(firstEmiDate);
+      lastDue.setMonth(lastDue.getMonth() + tenure - 1);
+      const lastInterest = Math.round(emi * 0.01 * 100) / 100;
+      schedulePreview.push({
+        installment_number: tenure,
+        due_date: lastDue.toISOString().split('T')[0],
+        opening_balance: Math.round((emi - lastInterest) * 100) / 100,
+        emi_amount: emi,
+        principal_component: Math.round((emi - lastInterest) * 100) / 100,
+        interest_component: lastInterest,
+        closing_balance: 0,
+      });
+    }
+
+    return buildResponse(config, {
+      application_id: body.application_id,
+      disbursement_status: 'DISBURSED',
+      approved_amount: approvedAmount,
+      disbursement_amount: disbursementAmount,
+      origination_fee_deducted: originationFee,
+      interest_rate: rate,
+      tenure_months: tenure,
+      monthly_emi: emi,
+      total_interest: totalInterest,
+      total_repayment: totalRepayment,
+      first_emi_date: firstEmiDateStr,
+      transaction_id: `TXN-${crypto.randomUUID().split('-')[0].toUpperCase()}`,
+      transfer_status: 'SUCCESS',
+      transfer_timestamp: new Date().toISOString(),
+      reconciliation_required: false,
+      schedule_preview: schedulePreview,
+      explanation: body.explanation || 'Loan disbursed successfully.',
+    });
+  }
+
   return Promise.reject(
     new Error(`No demo mock configured for ${String(config.method).toUpperCase()} ${config.url}`)
   );
