@@ -3,7 +3,7 @@ import { demoApiAdapter } from './demoApi';
 import { isDemoMode } from '../config/env';
 
 const disbursementClient = axios.create({
-  baseURL: import.meta.env.VITE_API_DISBURSEMENT_URL || 'http://localhost:8002',
+  baseURL: import.meta.env.VITE_API_DISBURSEMENT_URL || 'http://localhost:8003',
   headers: { 'Content-Type': 'application/json' },
   timeout: 60000,
   ...(isDemoMode ? { adapter: demoApiAdapter } : {}),
