@@ -1,29 +1,34 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { subscribeToPipeline } from '../../services/pipelineSSE';
-import { createInitialStages, markActive, markComplete, markError } from '../../utils/stageHelpers';
-import StageBlock from './StageBlock';
+import React, { useEffect, useMemo, useState } from "react";
+import { subscribeToPipeline } from "../../services/pipelineSSE";
+import {
+  createInitialStages,
+  markActive,
+  markComplete,
+  markError,
+} from "../../utils/stageHelpers";
+import StageBlock from "./StageBlock";
 
 const PIPELINE_STAGES = [
   {
-    id: 'kyc',
-    label: 'Identity Verification (KYC)',
-    description: 'Verifying applicant identity against authoritative sources',
-    icon: 'ID',
-    backendStage: 'kyc',
+    id: "kyc",
+    label: "Identity Verification (KYC)",
+    description: "Verifying applicant identity against authoritative sources",
+    icon: "ID",
+    backendStage: "kyc",
   },
   {
-    id: 'decisioning',
-    label: 'Underwriting & Risk Scoring',
-    description: 'Running decisioning models against applicant profile',
-    icon: 'UW',
-    backendStage: 'decisioning',
+    id: "decisioning",
+    label: "Underwriting & Risk Scoring",
+    description: "Running decisioning models against applicant profile",
+    icon: "UW",
+    backendStage: "decisioning",
   },
   {
-    id: 'disbursement',
-    label: 'Disbursement',
-    description: 'Transferring approved funds and generating the receipt',
-    icon: 'DS',
-    backendStage: 'disbursement',
+    id: "disbursement",
+    label: "Disbursement",
+    description: "Transferring approved funds and generating the receipt",
+    icon: "DS",
+    backendStage: "disbursement",
   },
 ];
 
@@ -31,7 +36,7 @@ const TOTAL_ESTIMATED_SECONDS = 10;
 
 const getElapsed = (data) => {
   const elapsed = data?.details?.elapsed;
-  return typeof elapsed === 'number' ? elapsed : null;
+  return typeof elapsed === "number" ? elapsed : null;
 };
 
 const normalizeTerminalDecision = (data) => {
@@ -40,20 +45,32 @@ const normalizeTerminalDecision = (data) => {
   const rawDecision =
     details.decision ||
     data.decision ||
-    (data.event === 'counter_offer_pending' ? 'COUNTER_OFFER' : null) ||
-    (data.event === 'funds_disbursed' ? 'DISBURSED' : null) ||
-    (data.event === 'application_declined' || data.event === 'kyc_failed' ? 'DECLINED' : null) ||
-    (data.status === 'failed' ? 'ERROR' : 'DECISION_COMPLETE');
+    (data.event === "counter_offer_pending" ||
+    data.event === "application_counter_offer"
+      ? "COUNTER_OFFER"
+      : null) ||
+    (data.event === "funds_disbursed" ? "DISBURSED" : null) ||
+    (data.event === "application_approved" || data.event === "approved"
+      ? "APPROVE"
+      : null) ||
+    (data.event === "application_declined" ||
+    data.event === "kyc_failed" ||
+    data.event === "declined"
+      ? "DECLINED"
+      : null) ||
+    (data.status === "failed" ? "ERROR" : "DECISION_COMPLETE");
 
   // Normalize backend short-form strings to UI constants
   const decision =
-    rawDecision === 'APPROVE' ? 'APPROVED' :
-    rawDecision === 'DECLINE' ? 'DECLINED' :
-    rawDecision;
+    rawDecision === "APPROVE"
+      ? "APPROVED"
+      : rawDecision === "DECLINE"
+        ? "DECLINED"
+        : rawDecision;
 
   // Counter offer options live under details.counter_offer_options
   const counterOfferOptions = (
-    details.counter_offer_options.generated_options || []
+    details.counter_offer_options?.generated_options || []
   ).map((opt) => ({
     option_id: opt.offer_id,
     description: opt.label,
@@ -66,14 +83,17 @@ const normalizeTerminalDecision = (data) => {
   }));
 
   // Approved terms from APPLICATION_APPROVED details
-  const approvedTerms = (decision === 'APPROVED') ? {
-    amount: details.approved_amount,
-    term_months: details.approved_tenure_months,
-    interest_rate: details.interest_rate,
-    monthly_payment: details.monthly_emi,
-    processing_fee: details.processing_fee,
-    terms_summary: details.terms_summary,
-  } : null;
+  const approvedTerms =
+    decision === "APPROVED"
+      ? {
+          amount: details.approved_amount,
+          term_months: details.approved_tenure_months,
+          interest_rate: details.interest_rate,
+          monthly_payment: details.monthly_emi,
+          processing_fee: details.processing_fee,
+          terms_summary: details.terms_summary,
+        }
+      : null;
 
   return {
     decision,
@@ -82,14 +102,17 @@ const normalizeTerminalDecision = (data) => {
     requested: details.requested || details.offer || null,
     counter: details.counter || null,
     approvedTerms,
-    counterOfferOptions: counterOfferOptions.length > 0 ? counterOfferOptions : null,
+    counterOfferOptions:
+      counterOfferOptions.length > 0 ? counterOfferOptions : null,
     disbursementReceipt: details.disbursement_receipt || null,
     application_id: data.application_id,
   };
 };
 
 const PipelineScreen = ({ applicationId, onComplete }) => {
-  const [stages, setStages] = useState(() => markActive(createInitialStages(PIPELINE_STAGES), 0));
+  const [stages, setStages] = useState(() =>
+    markActive(createInitialStages(PIPELINE_STAGES), 0),
+  );
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -98,20 +121,28 @@ const PipelineScreen = ({ applicationId, onComplete }) => {
       // eslint-disable-next-line no-unused-vars
       ({ event, data }) => {
         setError(null);
-        const stageIndex = PIPELINE_STAGES.findIndex((stage) => stage.backendStage === data.stage);
+        const stageIndex = PIPELINE_STAGES.findIndex(
+          (stage) => stage.backendStage === data.stage,
+        );
         const elapsed = getElapsed(data);
-        const failureReason = data.details?.reason || data.message || 'Verification failed. Please contact support.';
+        const failureReason =
+          data.details?.reason ||
+          data.message ||
+          "Verification failed. Please contact support.";
 
         if (stageIndex !== -1) {
-          if (data.status === 'started') {
+          if (data.status === "started") {
             setStages((prev) => markActive(prev, stageIndex));
           }
 
-          if (data.status === 'completed') {
+          if (data.status === "completed") {
             setStages((prev) => {
               const completedStages = markComplete(prev, stageIndex, elapsed);
 
-              if (data.is_terminal || stageIndex === PIPELINE_STAGES.length - 1) {
+              if (
+                data.is_terminal ||
+                stageIndex === PIPELINE_STAGES.length - 1
+              ) {
                 return completedStages;
               }
 
@@ -119,30 +150,43 @@ const PipelineScreen = ({ applicationId, onComplete }) => {
             });
           }
 
-          if (data.status === 'failed') {
+          if (data.status === "failed") {
             setStages((prev) => markError(prev, stageIndex, failureReason));
           }
         }
 
-        if (!data.is_terminal) {
+        const normalizedDecision = normalizeTerminalDecision(data);
+        const decisioningTerminal =
+          data.stage === "decisioning" &&
+          data.status === "completed" &&
+          ["APPROVED", "DECLINED", "COUNTER_OFFER"].includes(
+            normalizedDecision.decision,
+          );
+
+        if (!data.is_terminal && !decisioningTerminal) {
           return;
         }
 
-        window.setTimeout(() => onComplete(normalizeTerminalDecision(data)), 600);
+        // Keep one-shot behavior: first terminal/decsioning completion triggers next flow
+        window.setTimeout(() => onComplete(normalizedDecision), 600);
       },
       (subscriptionError) => {
         setError(subscriptionError);
-      }
+      },
     );
 
     return unsubscribe;
   }, [applicationId, onComplete]);
 
-  const completedStages = stages.filter((stage) => stage.status === 'complete').length;
-  const activeStage = stages.find((stage) => stage.status === 'active');
+  const completedStages = stages.filter(
+    (stage) => stage.status === "complete",
+  ).length;
+  const activeStage = stages.find((stage) => stage.status === "active");
   const progressPercentage = (completedStages / PIPELINE_STAGES.length) * 100;
   const estimatedSecondsRemaining = useMemo(() => {
-    const remaining = TOTAL_ESTIMATED_SECONDS - stages.reduce((sum, stage) => sum + (stage.elapsed || 0), 0);
+    const remaining =
+      TOTAL_ESTIMATED_SECONDS -
+      stages.reduce((sum, stage) => sum + (stage.elapsed || 0), 0);
     return Math.max(1, Math.round(remaining));
   }, [stages]);
 
@@ -154,16 +198,22 @@ const PipelineScreen = ({ applicationId, onComplete }) => {
             <span className="pipeline-kicker">Mission Control</span>
             <h2 className="card-title">Processing Your Application</h2>
             <p className="card-subtitle">
-              Application ID: <span className="pipeline-application-id">{applicationId}</span>
+              Application ID:{" "}
+              <span className="pipeline-application-id">{applicationId}</span>
             </p>
           </div>
           <div className="pipeline-status-chip">
-            {activeStage ? `Active: ${activeStage.label}` : 'Finalising application'}
+            {activeStage
+              ? `Active: ${activeStage.label}`
+              : "Finalising application"}
           </div>
         </div>
 
         <div className="pipeline-progress-bar" aria-hidden="true">
-          <div className="pipeline-progress-fill" style={{ width: `${progressPercentage}%` }} />
+          <div
+            className="pipeline-progress-fill"
+            style={{ width: `${progressPercentage}%` }}
+          />
         </div>
 
         <div className="pipeline-stage-list">
@@ -174,10 +224,13 @@ const PipelineScreen = ({ applicationId, onComplete }) => {
 
         <div className="pipeline-footer">
           <span>
-            {error ? 'Connection issue detected. Retrying stream updates...' : `Estimated time remaining: ~${estimatedSecondsRemaining}s`}
+            {error
+              ? "Connection issue detected. Retrying stream updates..."
+              : `Estimated time remaining: ~${estimatedSecondsRemaining}s`}
           </span>
-          <span className={error ? 'pipeline-footer-error' : ''}>
-            {error || 'Need help? Contact support for manual review assistance.'}
+          <span className={error ? "pipeline-footer-error" : ""}>
+            {error ||
+              "Need help? Contact support for manual review assistance."}
           </span>
         </div>
       </div>

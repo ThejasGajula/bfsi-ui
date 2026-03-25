@@ -70,69 +70,92 @@ export function subscribeToPipeline(applicationId, onEvent, onError) {
       },
       {
         delay: 12000,
-        data: decision.decision === "COUNTER_OFFER"
-          ? {
-              application_id: applicationId,
-              event: "COUNTER_OFFER_PENDING",
-              stage: "DECISIONING",
-              status: "completed",
-              message: "Underwriting completed: counter offer generated",
-              is_terminal: true,
-              details: {
-                decision: "COUNTER_OFFER",
-                reason: "Your requested amount exceeds our lending capacity based on your income and debt-to-income ratio.",
-                counter_offer_options: [
-                  {
-                    offer_id: "OPT_1",
-                    label: "Reduced Amount",
-                    principal_amount: decision.counter.amount,
-                    tenure_months: decision.counter.term_months,
-                    interest_rate: decision.counter.interest_rate,
-                    monthly_emi: decision.counter.monthly_payment,
-                    disbursement_amount: Math.round(decision.counter.amount * 0.99),
-                    total_repayment: decision.counter.monthly_payment * decision.counter.term_months,
-                  },
-                  {
-                    offer_id: "OPT_2",
-                    label: "Extended Tenure",
-                    principal_amount: Math.round(decision.counter.amount * 0.9),
-                    tenure_months: decision.counter.term_months + 12,
-                    interest_rate: decision.counter.interest_rate + 0.5,
-                    monthly_emi: Math.round(decision.counter.monthly_payment * 0.8),
-                    disbursement_amount: Math.round(decision.counter.amount * 0.89),
-                    total_repayment: Math.round(decision.counter.monthly_payment * 0.8) * (decision.counter.term_months + 12),
-                  },
-                  {
-                    offer_id: "OPT_3",
-                    label: "Lower Interest Rate",
-                    principal_amount: Math.round(decision.counter.amount * 0.8),
-                    tenure_months: decision.counter.term_months,
-                    interest_rate: decision.counter.interest_rate - 0.5,
-                    monthly_emi: Math.round(decision.counter.monthly_payment * 0.7),
-                    disbursement_amount: Math.round(decision.counter.amount * 0.79),
-                    total_repayment: Math.round(decision.counter.monthly_payment * 0.7) * decision.counter.term_months,
-                  },
-                ],
+        data:
+          decision.decision === "COUNTER_OFFER"
+            ? {
+                application_id: applicationId,
+                event: "COUNTER_OFFER_PENDING",
+                stage: "DECISIONING",
+                status: "completed",
+                message: "Underwriting completed: counter offer generated",
+                is_terminal: true,
+                details: {
+                  decision: "COUNTER_OFFER",
+                  reason:
+                    "Your requested amount exceeds our lending capacity based on your income and debt-to-income ratio.",
+                  counter_offer_options: [
+                    {
+                      offer_id: "OPT_1",
+                      label: "Reduced Amount",
+                      principal_amount: decision.counter.amount,
+                      tenure_months: decision.counter.term_months,
+                      interest_rate: decision.counter.interest_rate,
+                      monthly_emi: decision.counter.monthly_payment,
+                      disbursement_amount: Math.round(
+                        decision.counter.amount * 0.99,
+                      ),
+                      total_repayment:
+                        decision.counter.monthly_payment *
+                        decision.counter.term_months,
+                    },
+                    {
+                      offer_id: "OPT_2",
+                      label: "Extended Tenure",
+                      principal_amount: Math.round(
+                        decision.counter.amount * 0.9,
+                      ),
+                      tenure_months: decision.counter.term_months + 12,
+                      interest_rate: decision.counter.interest_rate + 0.5,
+                      monthly_emi: Math.round(
+                        decision.counter.monthly_payment * 0.8,
+                      ),
+                      disbursement_amount: Math.round(
+                        decision.counter.amount * 0.89,
+                      ),
+                      total_repayment:
+                        Math.round(decision.counter.monthly_payment * 0.8) *
+                        (decision.counter.term_months + 12),
+                    },
+                    {
+                      offer_id: "OPT_3",
+                      label: "Lower Interest Rate",
+                      principal_amount: Math.round(
+                        decision.counter.amount * 0.8,
+                      ),
+                      tenure_months: decision.counter.term_months,
+                      interest_rate: decision.counter.interest_rate - 0.5,
+                      monthly_emi: Math.round(
+                        decision.counter.monthly_payment * 0.7,
+                      ),
+                      disbursement_amount: Math.round(
+                        decision.counter.amount * 0.79,
+                      ),
+                      total_repayment:
+                        Math.round(decision.counter.monthly_payment * 0.7) *
+                        decision.counter.term_months,
+                    },
+                  ],
+                },
+              }
+            : {
+                application_id: applicationId,
+                event: "APPLICATION_APPROVED",
+                stage: "DECISIONING",
+                status: "completed",
+                message: "Underwriting completed: application approved",
+                is_terminal: true,
+                details: {
+                  decision: "APPROVE",
+                  reason:
+                    "Applicant meets all credit criteria with strong repayment history.",
+                  approved_amount: decision.requested.amount,
+                  approved_tenure_months: decision.requested.term_months,
+                  interest_rate: decision.requested.interest_rate,
+                  monthly_emi: decision.requested.monthly_payment,
+                  processing_fee: Math.round(decision.requested.amount * 0.01),
+                  terms_summary: `Loan of $${Number(decision.requested.amount).toLocaleString()} at ${decision.requested.interest_rate}% for ${decision.requested.term_months} months. EMI: $${Number(decision.requested.monthly_payment).toLocaleString()}/month.`,
+                },
               },
-            }
-          : {
-              application_id: applicationId,
-              event: "APPLICATION_APPROVED",
-              stage: "DECISIONING",
-              status: "completed",
-              message: "Underwriting completed: application approved",
-              is_terminal: true,
-              details: {
-                decision: "APPROVE",
-                reason: "Applicant meets all credit criteria with strong repayment history.",
-                approved_amount: decision.requested.amount,
-                approved_tenure_months: decision.requested.term_months,
-                interest_rate: decision.requested.interest_rate,
-                monthly_emi: decision.requested.monthly_payment,
-                processing_fee: Math.round(decision.requested.amount * 0.01),
-                terms_summary: `Loan of $${Number(decision.requested.amount).toLocaleString()} at ${decision.requested.interest_rate}% for ${decision.requested.term_months} months. EMI: $${Number(decision.requested.monthly_payment).toLocaleString()}/month.`,
-              },
-            },
       },
     ];
 
@@ -152,12 +175,15 @@ export function subscribeToPipeline(applicationId, onEvent, onError) {
     `${import.meta.env.VITE_API_ORCHESTRATOR_URL}/pipeline_updates/${applicationId}`,
   );
 
+  let terminalClosed = false;
+
   es.onmessage = (e) => {
     try {
       const parsed = normalizePipelinePayload(JSON.parse(e.data));
       if (parsed) {
         onEvent?.({ event: parsed.event, data: parsed });
         if (parsed.is_terminal) {
+          terminalClosed = true;
           es.close(); // close cleanly on terminal event
         }
       }
@@ -167,7 +193,9 @@ export function subscribeToPipeline(applicationId, onEvent, onError) {
   };
 
   es.onerror = () => {
-    onError?.("Connection lost. Please refresh.");
+    if (!terminalClosed) {
+      onError?.("Connection lost. Please refresh.");
+    }
     es.close();
   };
 
