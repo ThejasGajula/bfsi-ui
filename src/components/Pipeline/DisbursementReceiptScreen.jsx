@@ -130,14 +130,20 @@ const DisbursementReceiptScreen = ({ receipt, onReset }) => {
                 </thead>
                 <tbody>
                   {schedule_preview.map((inst, idx) => {
-                    const isLast = idx === schedule_preview.length - 1 && schedule_preview.length > 3;
-                    return (
-                      <>
-                        {isLast && (
-                          <tr key="ellipsis" className="receipt-table-ellipsis">
-                            <td colSpan={7}>· · ·</td>
-                          </tr>
-                        )}
+                    const isFirst3 = idx < 3;
+                    const isLast = idx === schedule_preview.length - 1;
+                    const shouldShowEllipsis = idx === 3 && schedule_preview.length > 4;
+
+                    if (shouldShowEllipsis) {
+                      return (
+                        <tr key="ellipsis" className="receipt-table-ellipsis">
+                          <td colSpan={7}>· · ·</td>
+                        </tr>
+                      );
+                    }
+
+                    if (isFirst3 || isLast) {
+                      return (
                         <tr key={inst.installment_number} className={isLast ? 'receipt-table-row--last' : ''}>
                           <td>{inst.installment_number}</td>
                           <td>{fmtDate(inst.due_date)}</td>
@@ -147,8 +153,10 @@ const DisbursementReceiptScreen = ({ receipt, onReset }) => {
                           <td>{fmt(inst.interest_component)}</td>
                           <td>{fmt(inst.closing_balance)}</td>
                         </tr>
-                      </>
-                    );
+                      );
+                    }
+
+                    return null;
                   })}
                 </tbody>
               </table>
