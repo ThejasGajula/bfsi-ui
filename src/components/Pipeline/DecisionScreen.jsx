@@ -96,6 +96,29 @@ const DecisionScreen = ({ decision, onConfirm, onDecline, onReset }) => {
     );
   }
 
+  if (decisionType === 'UNDER_REVIEW') {
+    return (
+      <div className="pipeline-shell fade-in">
+        <div className="card decision-screen">
+          <div className="decision-hero">
+            <span className="decision-badge">Under Review</span>
+            <h2 className="card-title">Your application is under review</h2>
+            <p className="card-subtitle">
+              Our AI has completed its assessment. A bank officer is now reviewing your
+              application before a final decision is made.
+            </p>
+          </div>
+          <div className="decision-summary">
+            <p>This typically takes 1–2 business days. You will be notified once a decision is reached.</p>
+            {decision?.application_id && (
+              <p><strong>Reference:</strong> {decision.application_id}</p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (decisionType === 'DISBURSED') {
     return (
       <div className="pipeline-shell fade-in">

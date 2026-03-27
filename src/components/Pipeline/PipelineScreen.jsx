@@ -24,6 +24,13 @@ const PIPELINE_STAGES = [
     backendStage: "decisioning",
   },
   {
+    id: "human_review",
+    label: "Bank Officer Review",
+    description: "A loan officer is reviewing your application",
+    icon: "HR",
+    backendStage: "human_review",
+  },
+  {
     id: "disbursement",
     label: "Disbursement",
     description: "Transferring approved funds and generating the receipt",
@@ -58,6 +65,8 @@ const normalizeTerminalDecision = (data) => {
     data.event === "declined"
       ? "DECLINED"
       : null) ||
+    (data.event === "human_review_required" ? "UNDER_REVIEW" : null) ||
+    (data.event === "human_review_rejected" ? "DECLINED" : null) ||
     (data.status === "failed" ? "ERROR" : "DECISION_COMPLETE");
 
   // Normalize backend short-form strings to UI constants
